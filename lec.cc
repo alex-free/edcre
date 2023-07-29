@@ -25,6 +25,8 @@
 #include <stdio.h>
 #include <stdint.h>
 
+#define VERSION "1.0.1"
+
 #define GF8_PRIM_POLY 0x11d // x^8 + x^4 + x^3 + x^2 + 1
 #define EDC_POLY 0x8001801b // (x^16 + x^15 + x^2 + 1) (x^16 + x^2 + x + 1)
 #define LEC_HEADER_OFFSET 12
@@ -489,11 +491,11 @@ void lec_encode_mode2_form2_sector(uint32_t adr, uint8_t *sector)
 
 void usage() 
 {
-    printf("edcre requires at least 1 argument\nedcre <original data track>\nedcre -v <original data track>    (display verbose info)\nedcre -x <original data track>    (disc image is not a PSX EDC game, start at sector 0 when corrected EDC/EEC data)\nedcre -x -v <original data track>    (disc image is not a PSX EDC game, start at sector 0 when corrected EDC/EEC data AND display verbose info)\n");
+    printf("At least 1 argument is required\nUsage:\nedcre <original data track>\nedcre -v <original data track>    (display verbose info)\nedcre -z <original data track>    (disc image is not an EDC protected PSX game, update EDC/EEC data starting at sector 0)\nedcre -z -v <original data track>    (disc image is not a PSX EDC game, update EDC/EEC data starting at sector 0 and display verbose info)\n");
 }
 int main(int argc, char **argv)
 {
-  printf("EDCRE - EDC/EEC Regenerator By Alex Free\nhttps://alex-free.github.io/edcre\nMade Possible By Modifying CDRDAO (GPLv2) Source Code:\nhttps://github.com/cdrdao/cdrdao\n\n");
+  printf("EDCRE v%s - EDC/EEC Regenerator By Alex Free\nhttps://alex-free.github.io/edcre\nMade Possible By Modifying CDRDAO (GPLv2) Source Code:\nhttps://github.com/cdrdao/cdrdao\n\n", VERSION);
 
   if((argc != 2) && (argc != 3) && (argc !=4))
   {
@@ -588,7 +590,12 @@ int main(int argc, char **argv)
 
   if(fixed_sectors > 0)
   {
-    printf("Updated EDC/EEC in %u sectors\n", fixed_sectors);
+    if(fixed_sectors == 1)
+    {
+      printf("Updated EDC/EEC in 1 sector\n");
+    } else {
+      printf("Updated EDC/EEC in %u sectors\n", fixed_sectors);
+    }
   } else {
     printf("No sectors needed EDC/EEC regeneration, nothing done\n");
   }

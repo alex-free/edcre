@@ -27,18 +27,17 @@ EDCRE provides a solution to update EDC/EEC data to match any patching done to a
 
 ## Downloads
 
-### Version 1.0.1 (7/29/2023)
+### Version 1.0.2 (8/21/2023)
 
-*	[edcre-1.0.1-windows\_x86](https://github.com/alex-free/edcre/releases/download/v1.0.1/edcre-1.0.1-windows_x86.zip) _For Windows 95 OSR 2.5 Or Newer (32-bit Windows)_
-*	[edcre-1.0.1-windows\_x86\_64](https://github.com/alex-free/edcre/releases/download/v1.0.1/edcre-1.0.1-windows_x86_64.zip) _For 64-bit Windows_
-*	[edcre-1.0.1-linux\_x86](https://github.com/alex-free/edcre/releases/download/v1.0.1/edcre-1.0.1-linux_x86_static.zip) _For x86 Linux Distros_
-*	[edcre-1.0.1-linux\_x86\_64](https://github.com/alex-free/edcre/releases/download/v1.0.1/edcre-1.0.1-linux_x86_64_static.zip) _For x86_64 Linux Distros_
-*	[edcre-1.0.1-source](https://github.com/alex-free/edcre/archive/refs/tags/v1.0.1.zip)
+*	[edcre-1.0.2-windows\_x86](https://github.com/alex-free/edcre/releases/download/v1.0.2/edcre-1.0.2-windows_x86.zip) _For Windows 95 OSR 2.5 Or Newer (32-bit Windows)_
+*	[edcre-1.0.2-windows\_x86\_64](https://github.com/alex-free/edcre/releases/download/v1.0.2/edcre-1.0.2-windows_x86_64.zip) _For 64-bit Windows_
+*	[edcre-1.0.2-linux\_x86](https://github.com/alex-free/edcre/releases/download/v1.0.2/edcre-1.0.2-linux_x86_static.zip) _For x86 Linux Distros_
+*	[edcre-1.0.2-linux\_x86\_64](https://github.com/alex-free/edcre/releases/download/v1.0.2/edcre-1.0.2-linux_x86_64_static.zip) _For x86_64 Linux Distros_
+*	[edcre-1.0.2-source](https://github.com/alex-free/edcre/archive/refs/tags/v1.0.2.zip)
 
 Changes:
 
-*   Prettier output and usage instructions.
-*   Improved documentation.
+*   Changed default behavior to start regen at sector 15 (to enable using this to update EDC after TOCPerfect patching).
 
 [About previous versions](changelog.md).
 
@@ -58,7 +57,7 @@ Someone working on the Dance Dance Revolution PSX games noticed this strange beh
 
 ## PSX EDC Protection Workaround With EDCRE
 
-EDCRE has a simple solution to allow edited/patched PSX disc images that have EDC Protection to work on real PSX hardware. By default (unless you specify the `-z` argument to specify updating all sectors in a disc image, starting at sector 0) It regenerates all EDC/EEC data starting at the 16th sector (LBA 15 in disc image/165 on disc) instead of starting at the first sector (LBA 0 in disc image/150 on disc). Because the 'reserved' zero-filled sectors 12-15 are untouched by EDCRE, the EDC protection never triggers in-game if you burn the disc image RAW using [CloneCD](https://www.redfox.bz/en/clonecd.html) or [CDRDAO](https://github.com/cdrdao/cdrdao). At the same time any edits/patches made to a PSX disc image will have matching EDC/EEC data (since any such edits would be on the game data itself which starts at the 16th sector) allowing patches to the data track work correctly on real hardware.
+EDCRE has a simple solution to allow edited/patched PSX disc images that have EDC Protection to work on real PSX hardware. By default (unless you specify the `-z` argument to specify updating all sectors in a disc image, starting at sector 0) It regenerates all EDC/EEC data starting at the 15th sector (LBA 15 in disc image/165 on disc) instead of starting at the first sector (LBA 0 in disc image/150 on disc). Because the 'reserved' zero-filled sectors 12-14 are untouched by EDCRE (sector 15 is also reserved but since it is utilized in TOCPerfect patching and doesn't effect EDC protection we still regen it), the EDC protection never triggers in-game if you burn the disc image RAW using [CloneCD](https://www.redfox.bz/en/clonecd.html) or [CDRDAO](https://github.com/cdrdao/cdrdao). At the same time any edits/patches made to a PSX disc image will have matching EDC/EEC data (since any such edits would be on the game data itself which starts at the 16th sector) allowing patches to the data track work correctly on real hardware.
 
 ## Usage
 

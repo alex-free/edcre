@@ -531,9 +531,9 @@ int main(int argc, char **argv)
 
   if(is_psx_edc) // default behavior unless -z is provided as an argument
   {
-// don't correct EDC/EEC data until 16th sector
-    lseek(data_track_fd, 0x9300, SEEK_SET); // 0x930 * 16 = 0x9300, 2352 = 0x930
-    lba = 166; // 16th sector = Volume Descriptor
+// don't correct EDC/EEC data until 15th sector (this is actually a reserved sector, but we utilize it for license data in TOCPerfect patching since it is not used by EDC protection, only sector 12 is used in that)
+    lseek(data_track_fd, 0x89D0, SEEK_SET); // 0x930 * 15 = 0x89D0, 2352 = 0x930
+    lba = 165; // Start at sector 15, since the next (16th) sector = Volume Descriptor, 
   } else {
 // Correct EDC/EEC throughout entire image starting at the first sector 0
     lba = 150;

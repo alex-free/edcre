@@ -20,24 +20,29 @@ EDCRE provides a solution to update EDC/EEC data to match any patching done to a
 *	[Github](https://github.com/alex-free/edcre)
 *   [CDRDAO-PLED](https://alex-free.github.io/cdrdao)
 *   [APrip](https://alex-free.github.io/aprip)
+*   [TOCPerfect Patcher](https://alex-free.github.io/tocperfect)
+
 *   [PS1 DemoSwap Patcher](https://alex-free.github.io/ps1demoswap)
 *	[Tonyhax International](https://alex-free.github.io/tonyhax-international)
 *	[Tonyhax International APv2 Bypass System](https://alex-free.github.io/tonyhax-international/anti-piracy-bypass.html)
+*   [The Ultimate Guide To PSX CD-Rs](https://alex-free.github.io/psx-cdr)
 
 
 ## Downloads
 
-### Version 1.0.2 (8/21/2023)
+### Version 1.0.3 (9/3/2023)
 
-*	[edcre-1.0.2-windows\_x86](https://github.com/alex-free/edcre/releases/download/v1.0.2/edcre-1.0.2-windows_x86.zip) _For Windows 95 OSR 2.5 Or Newer (32-bit Windows)_
-*	[edcre-1.0.2-windows\_x86\_64](https://github.com/alex-free/edcre/releases/download/v1.0.2/edcre-1.0.2-windows_x86_64.zip) _For 64-bit Windows_
-*	[edcre-1.0.2-linux\_x86](https://github.com/alex-free/edcre/releases/download/v1.0.2/edcre-1.0.2-linux_x86_static.zip) _For x86 Linux Distros_
-*	[edcre-1.0.2-linux\_x86\_64](https://github.com/alex-free/edcre/releases/download/v1.0.2/edcre-1.0.2-linux_x86_64_static.zip) _For x86_64 Linux Distros_
-*	[edcre-1.0.2-source](https://github.com/alex-free/edcre/archive/refs/tags/v1.0.2.zip)
+*	[edcre-1.0.3-windows\_x86](https://github.com/alex-free/edcre/releases/download/v1.0.3/edcre-1.0.3-windows_x86.zip) _For Windows 95 OSR 2.5 Or Newer (32-bit Windows)_
+*	[edcre-1.0.3-windows\_x86\_64](https://github.com/alex-free/edcre/releases/download/v1.0.3/edcre-1.0.3-windows_x86_64.zip) _For 64-bit Windows_
+*	[edcre-1.0.3-linux\_x86](https://github.com/alex-free/edcre/releases/download/v1.0.3/edcre-1.0.3-linux_x86_static.zip) _For x86 Linux Distros_
+*	[edcre-1.0.3-linux\_x86\_64](https://github.com/alex-free/edcre/releases/download/v1.0.3/edcre-1.0.3-linux_x86_64_static.zip) _For x86_64 Linux Distros_
+*	[edcre-1.0.3-source](https://github.com/alex-free/edcre/archive/refs/tags/v1.0.3.zip)
 
 Changes:
 
-*   Changed default behavior to start regen at sector 15 (to enable using this to update EDC after TOCPerfect patching).
+*   Added -t argument, which only reads the file for any sectors with invalid EDC/EEC data. Can be combined with the -v argument ot display each sector with invalid EDC/EEC. 
+
+*   [Binmerged](https://github.com/putnam/binmerge) games (which have the data track and all audio tracks as one bin file) now work with EDCRE correctly.
 
 [About previous versions](changelog.md).
 
@@ -65,26 +70,35 @@ EDCRE is a command line program. On Windows and most Linux distributions, you ca
 
 If you want to see more verbose info, and or if you want to update EDC/EEC data for all sectors (what you probably want if the data track bin file is not an EDC Protected PSX game but rather something else), you need to execute `edcre` with command line options:
 
-`edcre <original data track>`
+`Usage (1 to 3 arguments are required):`
+`edcre <track bin file>`
+`edcre <argument> <track bin file>`
+`edcre <argument> <argument> <track bin file>`
 
-`edcre -v <original data track>    (display verbose info)`
+`Optional Arguments:`
+`-v    Verbose, display each sector LBA number containing invalid EDC data, if any.`
 
-`edcre -z <original data track>    (disc image is not an EDC protected PSX game, update EDC/EEC data starting at sector 0)`
+`-z    This is not an EDC protected PSX game, handle EDC/EEC data starting at sector 0.`
 
-`edcre -z -v <original data track>    (disc image is not a PSX EDC game, update EDC/EEC data starting at sector 0 and display verbose info)`
+`-t   Test the disc image for sectors that contain invalid EDC/EEC. Does not modify the track bin file in any way.`
+
 
 ### Windows
 
 *   Start cmd.exe and provide the executable file.
-*   Provide any additional arguments (optional) (`-z` and or `-v`).
-*   Provide the disc image data track bin file as the last argument and execute the command, such as:
+
+*   Provide any additional arguments (up to 2 additional arguments can be specified at once) (optional) (`-z`, `-v`, `-t`).
+
+*   Provide the disc image data track bin file as the last argument (which must be argument 1, 2, or 3 depending on how many additional arguments, if any, that you are using) and execute the command, such as:
     `edcre.exe -v "track 01.bin"`
 
 ### Linux CLI
 
 *   Start Terminal and provide the executable file.
-*   Provide any additional arguments (optional) (`-z` and or `-v`).
-*   Provide the disc image data track bin file as the last argument and execute the command, such as:
+
+*   Provide any additional arguments (up to 2 additional arguments can be specified at once) (optional) (`-z`, `-v`, `-t`).
+
+*   Provide the disc image data track bin file as the last argument (which must be argument 1, 2, or 3 depending on how many additional arguments, if any, that you are using) and execute the command, such as:
     `./edcre" -v "track 01.bin"`
 
 ### Burning EDCRE Patched Disc Images

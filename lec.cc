@@ -25,7 +25,7 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#define VERSION "1.0.1"
+#define VERSION "1.0.3"
 
 #define GF8_PRIM_POLY 0x11d // x^8 + x^4 + x^3 + x^2 + 1
 #define EDC_POLY 0x8001801b // (x^16 + x^15 + x^2 + 1) (x^16 + x^2 + x + 1)
@@ -50,6 +50,7 @@ uint32_t fixed_sectors = 0; // keep track of number of sectors with updated EDC/
 
 bool verbose = false;
 bool is_psx_edc = true;
+bool test = false;
 
 typedef uint8_t gf8_t;
 
@@ -491,7 +492,7 @@ void lec_encode_mode2_form2_sector(uint32_t adr, uint8_t *sector)
 
 void usage() 
 {
-    printf("At least 1 argument is required\nUsage:\nedcre <original data track>\nedcre -v <original data track>    (display verbose info)\nedcre -z <original data track>    (disc image is not an EDC protected PSX game, update EDC/EEC data starting at sector 0)\nedcre -z -v <original data track>    (disc image is not a PSX EDC game, update EDC/EEC data starting at sector 0 and display verbose info)\n");
+    printf("Usage (1 to 3 arguments are required):\nedcre <track bin file>\nedcre <argument> <track bin file>\nedcre <argument> <argument> <track bin file>\n\nOptional Arguments:\n-v    Verbose, display each sector LBA number containing invalid EDC data, if any.\n\n-z    This is not an EDC protected PSX game, handle EDC/EEC data starting at sector 0.\n\n-t   Test the disc image for sectors that contain invalid EDC/EEC. Does not modify the track bin file in any way.\n");
 }
 int main(int argc, char **argv)
 {
@@ -507,25 +508,39 @@ int main(int argc, char **argv)
       if(strcmp(argv[1],"-v")==0)
         verbose = true;
 
+      if(strcmp(argv[1],"-t")==0)
+        test = true;
+
       if(strcmp(argv[1],"-z")==0)
         is_psx_edc = false;
 
       data_track_file = argv[2];
   } else if(argc == 4) {
-      if(((strcmp(argv[1],"-v") == 0) || (strcmp(argv[2],"-v")== 0 )) && ((strcmp(argv[1],"-z") == 0) || (strcmp(argv[2],"-z") == 0 )))
+
+      if((strcmp(argv[1],"-v")==0) || (strcmp(argv[2],"-v")==0))
       {
         verbose = true;
-        is_psx_edc = false;
-        data_track_file = argv[3];
-      } else {
-        usage();
-        return 1;
+      } 
+      
+      if((strcmp(argv[1],"-t")==0) || (strcmp(argv[2],"-t")==0)) 
+      {
+        test = true;
       }
+      
+      if((strcmp(argv[1],"-z")==0) || (strcmp(argv[2],"-z")==0)) 
+      {
+        is_psx_edc = false;
+      }
+
+        data_track_file = argv[3];
+  } else {
+    usage();
+    return 1;
   }
 
-  if ((data_track_fd = open(data_track_file, O_RDWR)) < 0)
+  if((data_track_fd = open(data_track_file, O_RDWR)) < 0)
   {
-    perror("Cannot open data track file: %s\n");
+    perror("Cannot open data track file\n");
     return 1;
   }
 
@@ -544,46 +559,73 @@ int main(int argc, char **argv)
     if (read(data_track_fd, buffer1, 2352) != 2352)
       break;
 
-    switch (*(buffer1 + 12 + 3))
+    // verify this is a data sector and skip if it is a CDDA sector (i.e. image has been binmerged with data track + audio tracks into one)
+    if(
+    (buffer1[0] == 0x00) &&
+    (buffer1[1] == 0xFF) &&
+    (buffer1[2] == 0xFF) &&
+    (buffer1[3] == 0xFF) &&
+    (buffer1[4] == 0xFF) &&
+    (buffer1[5] == 0xFF) &&
+    (buffer1[6] == 0xFF) &&
+    (buffer1[7] == 0xFF) &&
+    (buffer1[8] == 0xFF) &&
+    (buffer1[9] == 0xFF) &&
+    (buffer1[10] == 0xFF) &&
+    (buffer1[11] == 0x00)
+    ) 
     {
-    case 1:
-      memcpy(buffer2 + 16, buffer1 + 16, 2048);
-      lec_encode_mode1_sector(lba, buffer2);
-      break;
 
-    case 2:
-      if ((*(buffer1 + 12 + 4 + 2) & 0x20) != 0)
+     switch (*(buffer1 + 12 + 3))
+     {
+      case 1:
+        memcpy(buffer2 + 16, buffer1 + 16, 2048);
+        lec_encode_mode1_sector(lba, buffer2);
+        break;
+
+      case 2:
+        if ((*(buffer1 + 12 + 4 + 2) & 0x20) != 0)
+        {
+          // Mode 2 form 2 sector
+          memcpy(buffer2 + 16, buffer1 + 16, 2324 + 8);
+         lec_encode_mode2_form2_sector(lba, buffer2);
+       }
+       else
+       {
+         // Mode 2 Form 1 sector
+         memcpy(buffer2 + 16, buffer1 + 16, 2048 + 8);
+         lec_encode_mode2_form1_sector(lba, buffer2);
+       }
+       break;
+     }
+
+      if(memcmp(buffer1, buffer2, 2352) != 0)
       {
-        // Mode 2 form 2 sector
-        memcpy(buffer2 + 16, buffer1 + 16, 2324 + 8);
-        lec_encode_mode2_form2_sector(lba, buffer2);
+        if(verbose)
+        {
+          printf("LBA: %u fixed\n", lba);
+        } else if(test) {
+          printf("Invalid EDC/EEC at LBA: %u\n", lba);
+        }
+
+        fixed_sectors++;
       }
-      else
+
+      if(!test)
       {
-        // Mode 2 Form 1 sector
-        memcpy(buffer2 + 16, buffer1 + 16, 2048 + 8);
-        lec_encode_mode2_form1_sector(lba, buffer2);
+        lseek(data_track_fd, -2352, SEEK_CUR); // when we read() before, we advanced the fpos. We want to rewrite the previously read sector so go back a sector's worth and then write().
+        
+        if (write(data_track_fd, buffer2, 2352) != 2352)
+        {
+        printf("Error writing sector at LBA: %u\n", lba);
+        close(data_track_fd);
+        return 1;
+        }
       }
-      break;
-    }
-
-    if (memcmp(buffer1, buffer2, 2352) != 0)
-    {
-      if(verbose)
-        printf("LBA: %u fixed\n", lba);
-      
-      fixed_sectors++;
-    }
-
-    lseek(data_track_fd, -2352, SEEK_CUR); // when we read() before, we advanced the fpos. We want to rewrite the previously read sector so go back a sector's worth and then write().
-    if (write(data_track_fd, buffer2, 2352) != 2352)
-    {
-      printf("Error writing sector at LBA: %u\n", lba);
-      close(data_track_fd);
-      return 1;
     }
 
     lba++;
+  
   } while (1);
 
   close(data_track_fd);
@@ -592,12 +634,27 @@ int main(int argc, char **argv)
   {
     if(fixed_sectors == 1)
     {
-      printf("Updated EDC/EEC in 1 sector\n");
+      if(test)
+      {
+        printf("Found invalid EDC/EEC data in 1 sector\n");
+      } else {
+        printf("Updated EDC/EEC in 1 sector\n");
+      }
     } else {
-      printf("Updated EDC/EEC in %u sectors\n", fixed_sectors);
+      if(test)
+      {
+        printf("Found invalid EDC/EEC in %u sectors\n", fixed_sectors);
+      } else {
+        printf("Updated EDC/EEC in %u sectors\n", fixed_sectors);
+      }
     }
   } else {
-    printf("No sectors needed EDC/EEC regeneration, nothing done\n");
+    if(test)
+    {
+      printf("All scanned sectors already contain valid EEC/EDC data\n");
+    } else {
+      printf("No sectors needed EDC/EEC regeneration, nothing done\n");
+    }
   }
   
   return 0;

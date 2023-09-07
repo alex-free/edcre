@@ -30,19 +30,17 @@ EDCRE provides a solution to update EDC/EEC data to match any patching done to a
 
 ## Downloads
 
-### Version 1.0.3 (9/3/2023)
+### Version 1.0.4 (9/7/2023)
 
-*	[edcre-1.0.3-windows\_x86](https://github.com/alex-free/edcre/releases/download/v1.0.3/edcre-1.0.3-windows_x86.zip) _For Windows 95 OSR 2.5 Or Newer (32-bit Windows)_
-*	[edcre-1.0.3-windows\_x86\_64](https://github.com/alex-free/edcre/releases/download/v1.0.3/edcre-1.0.3-windows_x86_64.zip) _For 64-bit Windows_
-*	[edcre-1.0.3-linux\_x86](https://github.com/alex-free/edcre/releases/download/v1.0.3/edcre-1.0.3-linux_x86_static.zip) _For x86 Linux Distros_
-*	[edcre-1.0.3-linux\_x86\_64](https://github.com/alex-free/edcre/releases/download/v1.0.3/edcre-1.0.3-linux_x86_64_static.zip) _For x86_64 Linux Distros_
-*	[edcre-1.0.3-source](https://github.com/alex-free/edcre/archive/refs/tags/v1.0.3.zip)
+*	[edcre-1.0.4-windows\_x86](https://github.com/alex-free/edcre/releases/download/v1.0.4/edcre-1.0.4-windows_x86.zip) _For Windows 95 OSR 2.5 Or Newer (32-bit Windows)_
+*	[edcre-1.0.4-windows\_x86\_64](https://github.com/alex-free/edcre/releases/download/v1.0.4/edcre-1.0.4-windows_x86_64.zip) _For 64-bit Windows_
+*	[edcre-1.0.4-linux\_x86](https://github.com/alex-free/edcre/releases/download/v1.0.4/edcre-1.0.4-linux_x86_static.zip) _For x86 Linux Distros_
+*	[edcre-1.0.4-linux\_x86\_64](https://github.com/alex-free/edcre/releases/download/v1.0.4/edcre-1.0.4-linux_x86_64_static.zip) _For x86_64 Linux Distros_
+*	[edcre-1.0.4-source](https://github.com/alex-free/edcre/archive/refs/tags/v1.0.4.zip)
 
 Changes:
 
-*   Added -t argument, which only reads the file for any sectors with invalid EDC/EEC data. Can be combined with the -v argument ot display each sector with invalid EDC/EEC. 
-
-*   [Binmerged](https://github.com/putnam/binmerge) games (which have the data track and all audio tracks as one bin file) now work with EDCRE correctly.
+*   Patches [Binmerged](https://github.com/putnam/binmerge) games (which have the data track and all audio tracks as one bin file) faster.
 
 [About previous versions](changelog.md).
 

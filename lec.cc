@@ -25,7 +25,7 @@
 #include <stdio.h>
 #include <stdint.h>
 
-#define VERSION "1.0.3"
+#define VERSION "1.0.4"
 
 #define GF8_PRIM_POLY 0x11d // x^8 + x^4 + x^3 + x^2 + 1
 #define EDC_POLY 0x8001801b // (x^16 + x^15 + x^2 + 1) (x^16 + x^2 + x + 1)
@@ -51,6 +51,7 @@ uint32_t fixed_sectors = 0; // keep track of number of sectors with updated EDC/
 bool verbose = false;
 bool is_psx_edc = true;
 bool test = false;
+bool is_data_track = true;
 
 typedef uint8_t gf8_t;
 
@@ -532,7 +533,7 @@ int main(int argc, char **argv)
         is_psx_edc = false;
       }
 
-        data_track_file = argv[3];
+      data_track_file = argv[3];
   } else {
     usage();
     return 1;
@@ -554,7 +555,7 @@ int main(int argc, char **argv)
     lba = 150;
   }
 
-  do
+  while(is_data_track)
   {
     if (read(data_track_fd, buffer1, 2352) != 2352)
       break;
@@ -622,11 +623,13 @@ int main(int argc, char **argv)
         return 1;
         }
       }
+    } else {
+      is_data_track = false;
     }
 
     lba++;
   
-  } while (1);
+  }
 
   close(data_track_fd);
 

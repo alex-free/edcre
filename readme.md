@@ -2,7 +2,9 @@
 
 # EDCRE: EDC/EEC Regenerator For BIN+CUE CD Disc Images
 
-EDCRE provides a solution to update EDC/EEC data to match any patching done to a data track of a CD image. This allows PSX games with [EDC Protection](https://alex-free.github.io/aprip#edc) to be patched and hacked successfully with programs such as [PS1 DemoSwap Patcher](https://alex-free.github.io/ps1demoswap#tocperfect-patch) and [APrip](https://alex-free.github.io/aprip/#patching-the-cd-image) using a clever [workaround](#psx-edc-protection-workaround-with-edcre) turned on by default. EDCRE is not limited to EDC Protected PSX games however, just specify the `-z` argument to enforce all sectors to be checked and fixed with updated EDC/EEC data if needed.
+EDCRE provides an advanced solution to detect and or update EDC/EEC data to match any edits done to a data track of a CD image.
+
+![EDCRE](images/edcre.png)
 
 ## Table of Contents
 
@@ -30,17 +32,19 @@ EDCRE provides a solution to update EDC/EEC data to match any patching done to a
 
 ## Downloads
 
-### Version 1.0.4 (9/7/2023)
+### Version 1.0.5 (10/26/2023)
 
-*	[edcre-1.0.4-windows\_x86](https://github.com/alex-free/edcre/releases/download/v1.0.4/edcre-1.0.4-windows_x86.zip) _For Windows 95 OSR 2.5 Or Newer (32-bit Windows)_
-*	[edcre-1.0.4-windows\_x86\_64](https://github.com/alex-free/edcre/releases/download/v1.0.4/edcre-1.0.4-windows_x86_64.zip) _For 64-bit Windows_
-*	[edcre-1.0.4-linux\_x86](https://github.com/alex-free/edcre/releases/download/v1.0.4/edcre-1.0.4-linux_x86_static.zip) _For x86 Linux Distros_
-*	[edcre-1.0.4-linux\_x86\_64](https://github.com/alex-free/edcre/releases/download/v1.0.4/edcre-1.0.4-linux_x86_64_static.zip) _For x86_64 Linux Distros_
-*	[edcre-1.0.4-source](https://github.com/alex-free/edcre/archive/refs/tags/v1.0.4.zip)
+*	[edcre-v1.0.5-windows\_x86](https://github.com/alex-free/edcre/releases/download/v1.0.5/edcre-v1.0.5-windows-x86.zip) _For Windows 95 OSR 2.5 Or Newer (32-bit Windows)_
+*	[edcre-v1.0.5-windows-x86\_64](https://github.com/alex-free/edcre/releases/download/v1.0.5/edcre-v1.0.5-windows-x86_64.zip) _For 64-bit Windows_
+*	[edcre-v1.0.5-linux-x86](https://github.com/alex-free/edcre/releases/download/v1.0.5/edcre-v1.0.5-linux-x86_static.zip) _For x86 Linux Distros_
+*	[edcre-v1.0.5-linux-x86\_64](https://github.com/alex-free/edcre/releases/download/v1.0.5/edcre-v1.0.5-linux-x86_64_static.zip) _For x86_64 Linux Distros_
+*	[edcre-v1.0.5-source](https://github.com/alex-free/edcre/archive/refs/tags/v1.0.5.zip)
 
 Changes:
 
-*   Patches [Binmerged](https://github.com/putnam/binmerge) games (which have the data track and all audio tracks as one bin file) faster.
+*  Removed the `-z` argument. EDCRE now starts EDC/EEC regeneration at sector zero by default, this can be modified for any sector number starting by using the new `-s` argument followed by a sector number, i.e. `-s 16`.
+
+*   Significantly improved argument handling and cleaned up code. 
 
 [About previous versions](changelog.md).
 
@@ -60,7 +64,9 @@ Someone working on the Dance Dance Revolution PSX games noticed this strange beh
 
 ## PSX EDC Protection Workaround With EDCRE
 
-EDCRE has a simple solution to allow edited/patched PSX disc images that have EDC Protection to work on real PSX hardware. By default (unless you specify the `-z` argument to specify updating all sectors in a disc image, starting at sector 0) It regenerates all EDC/EEC data starting at the 15th sector (LBA 15 in disc image/165 on disc) instead of starting at the first sector (LBA 0 in disc image/150 on disc). Because the 'reserved' zero-filled sectors 12-14 are untouched by EDCRE (sector 15 is also reserved but since it is utilized in TOCPerfect patching and doesn't effect EDC protection we still regen it), the EDC protection never triggers in-game if you burn the disc image RAW using [CloneCD](https://www.redfox.bz/en/clonecd.html) or [CDRDAO](https://github.com/cdrdao/cdrdao). At the same time any edits/patches made to a PSX disc image will have matching EDC/EEC data (since any such edits would be on the game data itself which starts at the 16th sector) allowing patches to the data track work correctly on real hardware.
+EDCRE has a simple solution to allow edited/patched PSX disc images that have EDC Protection to work on real PSX hardware. By using the `-s 16` argument, you can not touch the checked sector (12) and instead only regenerate EDC/EEC data for all data sectors starting at the system volume descriptor sector (16/LBA 166).
+
+if you burn the disc image RAW using [CloneCD](https://www.redfox.bz/en/clonecd.html) or [CDRDAO](https://github.com/cdrdao/cdrdao). At the same time any edits/patches made to a PSX disc image will have matching EDC/EEC data (since any such edits would be on the game data itself which starts at the 16th sector) allowing patches to the data track work correctly on real hardware.
 
 ## Usage
 
@@ -68,33 +74,32 @@ EDCRE is a command line program. On Windows and most Linux distributions, you ca
 
 If you want to see more verbose info, and or if you want to update EDC/EEC data for all sectors (what you probably want if the data track bin file is not an EDC Protected PSX game but rather something else), you need to execute `edcre` with command line options:
 
-`Usage (1 to 3 arguments are required):`
-`edcre <track bin file>`
-`edcre <argument> <track bin file>`
-`edcre <argument> <argument> <track bin file>`
+`Usage: edcre <optional arguments> <track 01 bin file>`
 
 `Optional Arguments:`
-`-v    Verbose, display each sector LBA number containing invalid EDC data, if any.`
 
-`-z    This is not an EDC protected PSX game, handle EDC/EEC data starting at sector 0.`
+`-v    Verbose, display each sector LBA number containing invalid EDC data, if any.`
 
 `-t   Test the disc image for sectors that contain invalid EDC/EEC. Does not modify the track bin file in any way.`
 
+`-s    Start EDC/EEC regeneration at sector number following the -s argument instead of at sector 0. In example, -s 16 starts regeneration at sector 16 (LBA 166) which would be the system volume for a PSX disc image (and what is recommended most of the time). TOCPerfect Patcher users want -s 15 here however.`
+
+-----------------------------------------------------
 
 ### Windows
 
 *   Start cmd.exe and provide the executable file.
 
-*   Provide any additional arguments (up to 2 additional arguments can be specified at once) (optional) (`-z`, `-v`, `-t`).
+*   Provide any additional arguments (`-v`, `-t` `-s <sector number>`).
 
 *   Provide the disc image data track bin file as the last argument (which must be argument 1, 2, or 3 depending on how many additional arguments, if any, that you are using) and execute the command, such as:
     `edcre.exe -v "track 01.bin"`
 
-### Linux CLI
+### Linux
 
 *   Start Terminal and provide the executable file.
 
-*   Provide any additional arguments (up to 2 additional arguments can be specified at once) (optional) (`-z`, `-v`, `-t`).
+*   Provide any additional arguments (up to 2 additional arguments can be specified at once) (optional) (`-v`, `-t`, `-s <sector number>`).
 
 *   Provide the disc image data track bin file as the last argument (which must be argument 1, 2, or 3 depending on how many additional arguments, if any, that you are using) and execute the command, such as:
     `./edcre" -v "track 01.bin"`
@@ -117,14 +122,6 @@ Lets breakdown what each of these arguments to CDRDAO do:
 
 *   `--eject` will automatically eject the disc immediately after a successful burn.
 
-### Example Burn
-
-The example below is using the [PS1 DemoSwap Patcher's](https://alex-free.github.io/ps1demoswap) [TOCPerfect Patch Mode](https://alex-free.github.io/ps1demoswap/#tocperfect-patch-2) to first hack the Dance Dance Revolution 2nd Remix Japan game to boot the Tonyhax Loader first before the main game executable, which enables perfect loading via the [CD Player Swap Trick](https://alex-free.github.io/ps1demoswap#cd-player-swap-trick) found on early PSX consoles. Then EDCRE is ran, and it is burned RAW via CDRDAO.
-
-![TOCPerfect Patching And EDCRE Patching Dance Dance Revolution 2nd Remix Japan](images/ddr2j-tp.png)
-
-![Burning Dance Dance Revolution 2nd Remix Japan](images/ddr2j-burning.png)
-
 ## License
 
 EDCRE is modified [CDRDAO](https://github.com/cdrdao/cdrdao) source code, which is licensed under the GPLv2 license. Please see the file `license.txt` in each release for full info.
@@ -132,5 +129,5 @@ EDCRE is modified [CDRDAO](https://github.com/cdrdao/cdrdao) source code, which 
 ## Credits
 
 *   [CDRDAO](https://github.com/cdrdao/cdrdao) source code.
-*   [Socram8888](https://github.com/socram8888) for providing info on [how the game code detects the EDC checksum](https://github.com/socram8888/tonyhax/issues/121#issuecomment-1341365357).
+*   [Socram8888](https://github.com/socram8888) for providing info on [how EDC Protected games detect a corrected EDC checksum](https://github.com/socram8888/tonyhax/issues/121#issuecomment-1341365357).
 *   [MottZilla](https://github.com/mottzilla) for coming up with the workaround idea: "Just don't update those sectors" lol.

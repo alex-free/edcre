@@ -1,5 +1,17 @@
 # Changelog
 
+## Version 1.0.4 (9/7/2023)
+
+*	[edcre-1.0.4-windows\_x86](https://github.com/alex-free/edcre/releases/download/v1.0.4/edcre-1.0.4-windows_x86.zip) _For Windows 95 OSR 2.5 Or Newer (32-bit Windows)_
+*	[edcre-1.0.4-windows\_x86\_64](https://github.com/alex-free/edcre/releases/download/v1.0.4/edcre-1.0.4-windows_x86_64.zip) _For 64-bit Windows_
+*	[edcre-1.0.4-linux\_x86](https://github.com/alex-free/edcre/releases/download/v1.0.4/edcre-1.0.4-linux_x86_static.zip) _For x86 Linux Distros_
+*	[edcre-1.0.4-linux\_x86\_64](https://github.com/alex-free/edcre/releases/download/v1.0.4/edcre-1.0.4-linux_x86_64_static.zip) _For x86_64 Linux Distros_
+*	[edcre-1.0.4-source](https://github.com/alex-free/edcre/archive/refs/tags/v1.0.4.zip)
+
+Changes:
+
+*   Patches [Binmerged](https://github.com/putnam/binmerge) games (which have the data track and all audio tracks as one bin file) faster.
+
 ## Version 1.0.3 (9/3/2023)
 
 *	[edcre-1.0.3-windows\_x86](https://github.com/alex-free/edcre/releases/download/v1.0.3/edcre-1.0.3-windows_x86.zip) _For Windows 95 OSR 2.5 Or Newer (32-bit Windows)_

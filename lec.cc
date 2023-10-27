@@ -24,8 +24,9 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <stdlib.h>
 
-#define VERSION "1.0.4"
+#define VERSION "1.0.5"
 
 #define GF8_PRIM_POLY 0x11d // x^8 + x^4 + x^3 + x^2 + 1
 #define EDC_POLY 0x8001801b // (x^16 + x^15 + x^2 + 1) (x^16 + x^2 + x + 1)
@@ -40,18 +41,6 @@
 #define LEC_MODE2_FORM1_EDC_OFFSET 2072
 #define LEC_MODE2_FORM2_DATA_LEN (2324 + 8)
 #define LEC_MODE2_FORM2_EDC_OFFSET 2348
-
-char *data_track_file;
-int32_t data_track_fd;
-uint8_t buffer1[2352]; // original input sector buf
-uint8_t buffer2[2352]; // output sector buf with potentionally fixed EDC/EEC data
-uint32_t lba;
-uint32_t fixed_sectors = 0; // keep track of number of sectors with updated EDC/EEC data
-
-bool verbose = false;
-bool is_psx_edc = true;
-bool test = false;
-bool is_data_track = true;
 
 typedef uint8_t gf8_t;
 
@@ -493,13 +482,26 @@ void lec_encode_mode2_form2_sector(uint32_t adr, uint8_t *sector)
 
 void usage() 
 {
-    printf("Usage (1 to 3 arguments are required):\nedcre <track bin file>\nedcre <argument> <track bin file>\nedcre <argument> <argument> <track bin file>\n\nOptional Arguments:\n-v    Verbose, display each sector LBA number containing invalid EDC data, if any.\n\n-z    This is not an EDC protected PSX game, handle EDC/EEC data starting at sector 0.\n\n-t   Test the disc image for sectors that contain invalid EDC/EEC. Does not modify the track bin file in any way.\n");
+    printf("Usage: edcre <optional arguments> <track 01 bin file>\n\nOptional Arguments:\n\n-v    Verbose, display each sector LBA number containing invalid EDC data, if any.\n\n-t   Test the disc image for sectors that contain invalid EDC/EEC. Does not modify the track bin file in any way.\n\n-s    Start EDC/EEC regeneration at sector number following the -s argument instead of at sector 0. In example, -s 16 starts regeneration at sector 16 (LBA 166) which would be the system volume for a PSX disc image (and what is recommended most of the time). TOCPerfect Patcher users want -s 15 here however.\n");
 }
 int main(int argc, char **argv)
 {
+  char *data_track_file = 0;
+  int32_t data_track_fd;
+  uint8_t buffer1[2352]; // original input sector buf
+  uint8_t buffer2[2352]; // output sector buf with potentially fixed EDC/EEC data
+  uint32_t lba;
+  uint32_t fixed_sectors = 0; // keep track of number of sectors with updated EDC/EEC data
+  uint32_t custom_sector_edc_start_offset;
+
+  bool verbose = false;
+  bool test = false;
+  bool is_data_track = true;
+  bool custom_sector_edc_start = false;
+
   printf("EDCRE v%s - EDC/EEC Regenerator By Alex Free\nhttps://alex-free.github.io/edcre\nMade Possible By Modifying CDRDAO (GPLv2) Source Code:\nhttps://github.com/cdrdao/cdrdao\n\n", VERSION);
 
-  if((argc != 2) && (argc != 3) && (argc !=4))
+  if(argc > 6)
   {
     usage();
     return 1;
@@ -507,33 +509,43 @@ int main(int argc, char **argv)
       data_track_file = argv[1];
   } else if(argc == 3) {
       if(strcmp(argv[1],"-v")==0)
+      {
         verbose = true;
-
+        printf("Verbose Output Enabled\n");
+      }
       if(strcmp(argv[1],"-t")==0)
+      {
         test = true;
-
-      if(strcmp(argv[1],"-z")==0)
-        is_psx_edc = false;
-
+        printf("Only Check Sectors Enabled\n");
+      }
       data_track_file = argv[2];
-  } else if(argc == 4) {
+  } else if((argc == 4) || (argc == 5) || (argc == 6)){
 
-      if((strcmp(argv[1],"-v")==0) || (strcmp(argv[2],"-v")==0))
+    for(int i = 1; i < argc; i++)
+    {
+      if(strcmp(argv[i],"-v")==0)
       {
         verbose = true;
-      } 
-      
-      if((strcmp(argv[1],"-t")==0) || (strcmp(argv[2],"-t")==0)) 
+        printf("Verbose Output Enabled\n");
+      }
+      if(strcmp(argv[i],"-t")==0)
       {
         test = true;
+        printf("Only Check Sectors Enabled\n");
       }
-      
-      if((strcmp(argv[1],"-z")==0) || (strcmp(argv[2],"-z")==0)) 
+      if((strcmp(argv[i],"-s")==0))
       {
-        is_psx_edc = false;
+        printf("Custom Sector Start For EDC/EEC Regen Enabled\n");
+        if(i == (argc - 1))
+        {
+          printf("Error: -s must be followed by a number\n");
+          return 1;
+        }
+        lba = strtoul(argv[i + 1], NULL, 0); // next argument
+        custom_sector_edc_start = true;  
+        data_track_file = argv[(argc - 1)]; // last argument
       }
-
-      data_track_file = argv[3];
+    }
   } else {
     usage();
     return 1;
@@ -545,11 +557,11 @@ int main(int argc, char **argv)
     return 1;
   }
 
-  if(is_psx_edc) // default behavior unless -z is provided as an argument
-  {
-// don't correct EDC/EEC data until 15th sector (this is actually a reserved sector, but we utilize it for license data in TOCPerfect patching since it is not used by EDC protection, only sector 12 is used in that)
-    lseek(data_track_fd, 0x89D0, SEEK_SET); // 0x930 * 15 = 0x89D0, 2352 = 0x930
-    lba = 165; // Start at sector 15, since the next (16th) sector = Volume Descriptor, 
+  if(custom_sector_edc_start) {
+    custom_sector_edc_start_offset = (lba * 0x930);
+    lba = (lba + 150);
+    printf("Starting EDC Regen at LBA %u (0x%08X)\n", lba, custom_sector_edc_start_offset);
+    lseek(data_track_fd, custom_sector_edc_start_offset, SEEK_SET);
   } else {
 // Correct EDC/EEC throughout entire image starting at the first sector 0
     lba = 150;

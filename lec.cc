@@ -26,7 +26,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#define VERSION "1.0.5"
+#define VERSION "1.0.6"
 
 #define GF8_PRIM_POLY 0x11d // x^8 + x^4 + x^3 + x^2 + 1
 #define EDC_POLY 0x8001801b // (x^16 + x^15 + x^2 + 1) (x^16 + x^2 + x + 1)
@@ -482,24 +482,27 @@ void lec_encode_mode2_form2_sector(uint32_t adr, uint8_t *sector)
 
 void usage() 
 {
-    printf("Usage: edcre <optional arguments> <track 01 bin file>\n\nOptional Arguments:\n\n-v    Verbose, display each sector LBA number containing invalid EDC data, if any.\n\n-t   Test the disc image for sectors that contain invalid EDC/EEC. Does not modify the track bin file in any way.\n\n-s    Start EDC/EEC regeneration at sector number following the -s argument instead of at sector 0. In example, -s 16 starts regeneration at sector 16 (LBA 166) which would be the system volume for a PSX disc image (and what is recommended most of the time). TOCPerfect Patcher users want -s 15 here however.\n");
+    printf("Usage: edcre <optional arguments> <track 01 bin file>\n\nOptional Arguments:\n\n-v    Verbose, display each sector LBA number containing invalid EDC data, if any.\n\n-t   Test the disc image for sectors that contain invalid EDC/ECC. Does not modify the track bin file in any way.\n\n-s    Start EDC/ECC regeneration at sector number following the -s argument instead of at sector 0. In example, -s 16 starts regeneration at sector 16 (LBA 166) which would be the system volume for a PSX disc image (and what is recommended most of the time). TOCPerfect Patcher users want -s 15 here however.\n");
 }
 int main(int argc, char **argv)
 {
   char *data_track_file = 0;
   int32_t data_track_fd;
   uint8_t buffer1[2352]; // original input sector buf
-  uint8_t buffer2[2352]; // output sector buf with potentially fixed EDC/EEC data
+  uint8_t buffer2[2352]; // output sector buf with potentially fixed EDC/ECC data
   uint32_t lba;
-  uint32_t fixed_sectors = 0; // keep track of number of sectors with updated EDC/EEC data
+  uint32_t fixed_sectors = 0; // keep track of number of sectors with updated EDC/ECC data
   uint32_t custom_sector_edc_start_offset;
 
   bool verbose = false;
   bool test = false;
   bool is_data_track = true;
   bool custom_sector_edc_start = false;
+  bool mode1 = false;
+  bool mode2_form1 = false;
+  bool mode2_form2 = false;
 
-  printf("EDCRE v%s - EDC/EEC Regenerator By Alex Free\nhttps://alex-free.github.io/edcre\nMade Possible By Modifying CDRDAO (GPLv2) Source Code:\nhttps://github.com/cdrdao/cdrdao\n\n", VERSION);
+  printf("EDCRE v%s - EDC/ECC Regenerator By Alex Free\nhttps://alex-free.github.io/edcre\nMade Possible By Modifying CDRDAO (GPLv2) Source Code:\nhttps://github.com/cdrdao/cdrdao\n\n", VERSION);
 
   if(argc > 6)
   {
@@ -535,7 +538,7 @@ int main(int argc, char **argv)
       }
       if((strcmp(argv[i],"-s")==0))
       {
-        printf("Custom Sector Start For EDC/EEC Regen Enabled\n");
+        printf("Custom Sector Start For EDC/ECC Regen Enabled\n");
         if(i == (argc - 1))
         {
           printf("Error: -s must be followed by a number\n");
@@ -543,9 +546,11 @@ int main(int argc, char **argv)
         }
         lba = strtoul(argv[i + 1], NULL, 0); // next argument
         custom_sector_edc_start = true;  
-        data_track_file = argv[(argc - 1)]; // last argument
       }
     }
+    
+    data_track_file = argv[(argc - 1)]; // last argument
+
   } else {
     usage();
     return 1;
@@ -560,15 +565,18 @@ int main(int argc, char **argv)
   if(custom_sector_edc_start) {
     custom_sector_edc_start_offset = (lba * 0x930);
     lba = (lba + 150);
-    printf("Starting EDC Regen at LBA %u (0x%08X)\n", lba, custom_sector_edc_start_offset);
+    printf("Starting EDC/EEC Regeneration at LBA %u (0x%08X)\n", lba, custom_sector_edc_start_offset);
     lseek(data_track_fd, custom_sector_edc_start_offset, SEEK_SET);
   } else {
-// Correct EDC/EEC throughout entire image starting at the first sector 0
+// Correct EDC/ECC throughout entire image starting at the first sector 0
     lba = 150;
   }
 
   while(is_data_track)
   {
+    printf("\rScanning LBA %u", lba);
+    fflush(stdout);
+  
     if (read(data_track_fd, buffer1, 2352) != 2352)
       break;
 
@@ -594,6 +602,9 @@ int main(int argc, char **argv)
       case 1:
         memcpy(buffer2 + 16, buffer1 + 16, 2048);
         lec_encode_mode1_sector(lba, buffer2);
+         mode1 = true;
+         mode2_form1 = false;
+         mode2_form2 = false;
         break;
 
       case 2:
@@ -602,23 +613,43 @@ int main(int argc, char **argv)
           // Mode 2 form 2 sector
           memcpy(buffer2 + 16, buffer1 + 16, 2324 + 8);
          lec_encode_mode2_form2_sector(lba, buffer2);
+         mode1 = false;
+         mode2_form1 = false;
+         mode2_form2 = true;
        }
        else
        {
          // Mode 2 Form 1 sector
          memcpy(buffer2 + 16, buffer1 + 16, 2048 + 8);
          lec_encode_mode2_form1_sector(lba, buffer2);
+         mode1 = false;
+         mode2_form1 = true;
+         mode2_form2 = false;
        }
        break;
      }
 
       if(memcmp(buffer1, buffer2, 2352) != 0)
       {
-        if(verbose)
+        if((verbose) && (!test))
         {
-          printf("LBA: %u fixed\n", lba);
+          if(mode1)
+            printf("- Mode 1 Sector fixed\n");
+
+          if(mode2_form1)
+            printf("- Mode 2 Form 1 fixed\n");
+
+          if(mode2_form2)
+            printf("- Mode 2 Form 2 Sector fixed\n");
         } else if(test) {
-          printf("Invalid EDC/EEC at LBA: %u\n", lba);
+          if(mode1)
+            printf(" - Mode 1 Sector has invalid EDC/ECC\n");
+
+          if(mode2_form1)
+            printf(" - Mode 2 Form 1 Sector has invalid EDC/ECC\n");
+
+          if(mode2_form2)
+            printf(" - Mode 2 Form 2 Sector has invalid EDC/ECC\n");
         }
 
         fixed_sectors++;
@@ -651,24 +682,24 @@ int main(int argc, char **argv)
     {
       if(test)
       {
-        printf("Found invalid EDC/EEC data in 1 sector\n");
+        printf("\nFound invalid EDC/ECC data in 1 sector\n");
       } else {
-        printf("Updated EDC/EEC in 1 sector\n");
+        printf("\nUpdated EDC/ECC in 1 sector\n");
       }
     } else {
       if(test)
       {
-        printf("Found invalid EDC/EEC in %u sectors\n", fixed_sectors);
+        printf("\nFound invalid EDC/ECC in %u sectors\n", fixed_sectors);
       } else {
-        printf("Updated EDC/EEC in %u sectors\n", fixed_sectors);
+        printf("\nUpdated EDC/ECC in %u sectors\n", fixed_sectors);
       }
     }
   } else {
     if(test)
     {
-      printf("All scanned sectors already contain valid EEC/EDC data\n");
+      printf("\nAll scanned sectors already contain valid ECC/EDC data\n");
     } else {
-      printf("No sectors needed EDC/EEC regeneration, nothing done\n");
+      printf("\nNo sectors needed EDC/ECC regeneration, nothing done\n");
     }
   }
   

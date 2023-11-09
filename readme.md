@@ -1,15 +1,15 @@
 # [alex-free.github.io](https://alex-free.github.io)
 
-# EDCRE: EDC/EEC Regenerator For BIN+CUE CD Disc Images
+# EDCRE: EDC/ECC Regenerator For BIN+CUE CD Disc Images
 
-EDCRE provides an advanced solution to detect and or update EDC/EEC data to match any edits done to a data track of a CD image.
+EDCRE provides an advanced solution to detect and or update EDC/ECC data to match any edits done to a data track of a CD image.
 
 ![EDCRE](images/edcre.png)
 
 ## Table of Contents
 
 * [Downloads](#downloads)
-* [EDC/EEC Data](#edceec-data)
+* [EDC/ECC Data](#edcECC-data)
 * [PSX EDC Anti-Piracy Protection](#psx-edc-anti-piracy-protection)
 * [PSX EDC Protection Workaround With EDCRE](#psx-edc-protection-workaround-with-edcre)
 * [Usage](#usage)
@@ -32,47 +32,46 @@ EDCRE provides an advanced solution to detect and or update EDC/EEC data to matc
 
 ## Downloads
 
-### Version 1.0.5 (10/26/2023)
+### Version 1.0.6 (11/9/2023)
 
-*	[edcre-v1.0.5-windows\_x86](https://github.com/alex-free/edcre/releases/download/v1.0.5/edcre-v1.0.5-windows-x86.zip) _For Windows 95 OSR 2.5 Or Newer (32-bit Windows)_
-*	[edcre-v1.0.5-windows-x86\_64](https://github.com/alex-free/edcre/releases/download/v1.0.5/edcre-v1.0.5-windows-x86_64.zip) _For 64-bit Windows_
-*	[edcre-v1.0.5-linux-x86](https://github.com/alex-free/edcre/releases/download/v1.0.5/edcre-v1.0.5-linux-x86_static.zip) _For x86 Linux Distros_
-*	[edcre-v1.0.5-linux-x86\_64](https://github.com/alex-free/edcre/releases/download/v1.0.5/edcre-v1.0.5-linux-x86_64_static.zip) _For x86_64 Linux Distros_
-*	[edcre-v1.0.5-source](https://github.com/alex-free/edcre/archive/refs/tags/v1.0.5.zip)
+*	[edcre-v1.0.6-windows\_x86](https://github.com/alex-free/edcre/releases/download/v1.0.6/edcre-v1.0.6-windows-x86.zip) _For Windows 95 OSR 2.5 Or Newer (32-bit Windows)_
+*	[edcre-v1.0.6-windows-x86\_64](https://github.com/alex-free/edcre/releases/download/v1.0.6/edcre-v1.0.6-windows-x86_64.zip) _For 64-bit Windows_
+*	[edcre-v1.0.6-linux-x86](https://github.com/alex-free/edcre/releases/download/v1.0.6/edcre-v1.0.6-linux-x86_static.zip) _For x86 Linux Distros_
+*	[edcre-v1.0.6-linux-x86\_64](https://github.com/alex-free/edcre/releases/download/v1.0.6/edcre-v1.0.6-linux-x86_64_static.zip) _For x86_64 Linux Distros_
+*	[edcre-v1.0.6-source](https://github.com/alex-free/edcre/archive/refs/tags/v1.0.5.zip)
 
 Changes:
 
-*  Removed the `-z` argument. EDCRE now starts EDC/EEC regeneration at sector zero by default, this can be modified for any sector number starting by using the new `-s` argument followed by a sector number, i.e. `-s 16`.
-
-*   Significantly improved argument handling and cleaned up code. 
+*  More verbosity, sector type info is now displayed.
+*  Added very pretty output text.
 
 [About previous versions](changelog.md).
 
-## What Is EDC/EEC Data?
+## What Is EDC/ECC Data?
 
-EDC is a special checksum that verifies the integrity of the user data portion of a sector in a data track. If during a sector read the EDC does not match the data read by the CD drive, EEC data then provides a way to correct the data to what was expected in most cases. If a significant amount of the sector is unreadable or modified this may not be correctable with EEC data, but in many common cases (i.e. slightly scratched discs) it does work quite well and provides much more reliability and resilience for data CD reading. 
+EDC is a special checksum that verifies the integrity of the user data portion of a sector in a data track. If during a sector read the EDC does not match the data read by the CD drive, ECC data then provides a way to correct the data to what was expected in most cases. If a significant amount of the sector is unreadable or modified this may not be correctable with ECC data, but in many common cases (i.e. slightly scratched discs) it does work quite well and provides much more reliability and resilience for data CD reading. 
 
-When you edit a data track in a CD image, the original EDC and EEC will remain untouched causing it to mismatch the new contents of the user data in any modified sectors, causing any changes to not take effect or invalidate the disc image when it is burned to a disc and used on real hardware. Usually this isn't a problem however since almost all CD burning software writes updated EDC/EEC to burned discs, and most emulators ignore the EDC/EEC data in sectors by design. [IMGBurn](https://www.imgburn.com/) always writes updated EDC/EEC data, and there isn't a way to disable that behavior. [CDRDAO](https://github.com/cdrdao/cdrdao) always writes updated EDC/EEC data when using the default `generic-mmc` driver. It is possible however specify the `generic-mmc-raw` be used instead which **does not modify EDC/EEC data and leaves it as is**. [CloneCD](https://www.redfox.bz/en/clonecd.html) always writes updated EDC/EEC data **unless you use the RAW writing mode**. Writing updated EDC data to disc is usually what you want, that way the correct matching EDC/EEC data correlates to any modification to the user data of sectors found in a disc image. 
+When you edit a data track in a CD image, the original EDC and ECC will remain untouched causing it to mismatch the new contents of the user data in any modified sectors, causing any changes to not take effect or invalidate the disc image when it is burned to a disc and used on real hardware. Usually this isn't a problem however since almost all CD burning software writes updated EDC/ECC to burned discs, and most emulators ignore the EDC/ECC data in sectors by design. [IMGBurn](https://www.imgburn.com/) always writes updated EDC/ECC data, and there isn't a way to disable that behavior. [CDRDAO](https://github.com/cdrdao/cdrdao) always writes updated EDC/ECC data when using the default `generic-mmc` driver. It is possible however specify the `generic-mmc-raw` be used instead which **does not modify EDC/ECC data and leaves it as is**. [CloneCD](https://www.redfox.bz/en/clonecd.html) always writes updated EDC/ECC data **unless you use the RAW writing mode**. Writing updated EDC data to disc is usually what you want, that way the correct matching EDC/ECC data correlates to any modification to the user data of sectors found in a disc image. 
 
 But what if you want to edit user data of sectors in a data track of a CD disc image and then write it raw? That is exactly what I want to do, as it defeats the EDC-based anti-piracy protection measure found in almost all of the [Dance Dance Revolution PSX games](https://alex-free.github.io/aprip#edc).
 
 ## PSX EDC Anti-Piracy Protection
 
-The idea of EDC/EEC based additional anti-piracy protection is a brilliantly flawed one. See, Sony's tools to generate disc images back in the day were [buggy](http://www.psxdev.net/forum/viewtopic.php?t=1475). One such bug appears to be that the [reserved sectors 12-15](http://problemkaputt.de/psx-spx.htm#cdromisovolumedescriptors), which are zero filled in the user data portion of the sector, _also_ **have an EDC checksum of zero**. The correct checksum for a zero-filled user data sector _should be_ `3F 13 B0 BE`, _but it isn't_. It's `00 00 00 00` like the rest of the sector besides the sync data. This actually doesn't matter in practice, so the bug went unoticed and the technically invalid sector 12-15s shipped on real licensed PSX CD-ROMs. This apparently got fixed eventually in some newer version of the `cdgen` Sony tool that created disc images.
+The idea of EDC/ECC based additional anti-piracy protection is a brilliantly flawed one. See, Sony's tools to generate disc images back in the day were [buggy](http://www.psxdev.net/forum/viewtopic.php?t=1475). One such bug appears to be that the [reserved sectors 12-15](http://problemkaputt.de/psx-spx.htm#cdromisovolumedescriptors), which are zero filled in the user data portion of the sector, _also_ **have an EDC checksum of zero**. The correct checksum for a zero-filled user data sector _should be_ `3F 13 B0 BE`, _but it isn't_. It's `00 00 00 00` like the rest of the sector besides the sync data. This actually doesn't matter in practice, so the bug went unoticed and the technically invalid sector 12-15s shipped on real licensed PSX CD-ROMs. This apparently got fixed eventually in some newer version of the `cdgen` Sony tool that created disc images.
 
 Someone working on the Dance Dance Revolution PSX games noticed this strange behavior and figured out that it could be exploited as an additional anti-piracy protection measure. If the real licensed PSX CD-ROM discs were shipped with an EDC checksum of zero in sector 12-15, then when someone went to rip the real licensed PSX CD-ROM disc and then burn it back to a CD-R, the EDC checksum in sector 12-15 would no longer be `00 00 00 00`, it would be the expected `3F 13 B0 BE`. [Game code](https://github.com/socram8888/tonyhax/issues/121#issuecomment-1341381549) can read the EDC checksum on the disc at sector 12, and a routine could then lock up the game if the EDC data is non-zero to deter piracy.
 
 ## PSX EDC Protection Workaround With EDCRE
 
-EDCRE has a simple solution to allow edited/patched PSX disc images that have EDC Protection to work on real PSX hardware. By using the `-s 16` argument, you can not touch the checked sector (12) and instead only regenerate EDC/EEC data for all data sectors starting at the system volume descriptor sector (16/LBA 166).
+EDCRE has a simple solution to allow edited/patched PSX disc images that have EDC Protection to work on real PSX hardware. By using the `-s 16` argument, you can not touch the checked sector (12) and instead only regenerate EDC/ECC data for all data sectors starting at the system volume descriptor sector (16/LBA 166).
 
-if you burn the disc image RAW using [CloneCD](https://www.redfox.bz/en/clonecd.html) or [CDRDAO](https://github.com/cdrdao/cdrdao). At the same time any edits/patches made to a PSX disc image will have matching EDC/EEC data (since any such edits would be on the game data itself which starts at the 16th sector) allowing patches to the data track work correctly on real hardware.
+if you burn the disc image RAW using [CloneCD](https://www.redfox.bz/en/clonecd.html) or [CDRDAO](https://github.com/cdrdao/cdrdao). At the same time any edits/patches made to a PSX disc image will have matching EDC/ECC data (since any such edits would be on the game data itself which starts at the 16th sector) allowing patches to the data track work correctly on real hardware.
 
 ## Usage
 
-EDCRE is a command line program. On Windows and most Linux distributions, you can simply drag and drop the "track 01.bin" file of the PSX game you want to update EDC/EEC data for.
+EDCRE is a command line program. On Windows and most Linux distributions, you can simply drag and drop the "track 01.bin" file of the PSX game you want to update EDC/ECC data for.
 
-If you want to see more verbose info, and or if you want to update EDC/EEC data for all sectors (what you probably want if the data track bin file is not an EDC Protected PSX game but rather something else), you need to execute `edcre` with command line options:
+If you want to see more verbose info, and or if you want to update EDC/ECC data for all sectors (what you probably want if the data track bin file is not an EDC Protected PSX game but rather something else), you need to execute `edcre` with command line options:
 
 `Usage: edcre <optional arguments> <track 01 bin file>`
 
@@ -80,9 +79,9 @@ If you want to see more verbose info, and or if you want to update EDC/EEC data 
 
 `-v    Verbose, display each sector LBA number containing invalid EDC data, if any.`
 
-`-t   Test the disc image for sectors that contain invalid EDC/EEC. Does not modify the track bin file in any way.`
+`-t   Test the disc image for sectors that contain invalid EDC/ECC. Does not modify the track bin file in any way.`
 
-`-s    Start EDC/EEC regeneration at sector number following the -s argument instead of at sector 0. In example, -s 16 starts regeneration at sector 16 (LBA 166) which would be the system volume for a PSX disc image (and what is recommended most of the time). TOCPerfect Patcher users want -s 15 here however.`
+`-s    Start EDC/ECC regeneration at sector number following the -s argument instead of at sector 0. In example, -s 16 starts regeneration at sector 16 (LBA 166) which would be the system volume for a PSX disc image (and what is recommended most of the time). TOCPerfect Patcher users want -s 15 here however.`
 
 -----------------------------------------------------
 

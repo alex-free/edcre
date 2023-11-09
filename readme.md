@@ -38,7 +38,7 @@ EDCRE provides an advanced solution to detect and or update EDC/ECC data to matc
 *	[edcre-v1.0.6-windows-x86\_64](https://github.com/alex-free/edcre/releases/download/v1.0.6/edcre-v1.0.6-windows-x86_64.zip) _For 64-bit Windows_
 *	[edcre-v1.0.6-linux-x86](https://github.com/alex-free/edcre/releases/download/v1.0.6/edcre-v1.0.6-linux-x86_static.zip) _For x86 Linux Distros_
 *	[edcre-v1.0.6-linux-x86\_64](https://github.com/alex-free/edcre/releases/download/v1.0.6/edcre-v1.0.6-linux-x86_64_static.zip) _For x86_64 Linux Distros_
-*	[edcre-v1.0.6-source](https://github.com/alex-free/edcre/archive/refs/tags/v1.0.5.zip)
+*	[edcre-v1.0.6-source](https://github.com/alex-free/edcre/archive/refs/tags/v1.0.6.zip)
 
 Changes:
 

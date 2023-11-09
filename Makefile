@@ -1,7 +1,7 @@
 # edcre GNUMakefile by Alex Free
 CXX=g++
 CXX_FLAGS=-Wall -Werror -Ofast
-VER=1.0.5
+VER=1.0.6
 
 edcre: clean
 	$(CXX) $(CXX_FLAGS) lec.cc -o edcre

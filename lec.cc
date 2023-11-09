@@ -514,12 +514,12 @@ int main(int argc, char **argv)
       if(strcmp(argv[1],"-v")==0)
       {
         verbose = true;
-        printf("Verbose Output Enabled\n");
+        //printf("Verbose Output Enabled\n");
       }
       if(strcmp(argv[1],"-t")==0)
       {
         test = true;
-        printf("Only Check Sectors Enabled\n");
+        //printf("Only Check Sectors Enabled\n");
       }
       data_track_file = argv[2];
   } else if((argc == 4) || (argc == 5) || (argc == 6)){
@@ -529,16 +529,16 @@ int main(int argc, char **argv)
       if(strcmp(argv[i],"-v")==0)
       {
         verbose = true;
-        printf("Verbose Output Enabled\n");
+        //printf("Verbose Output Enabled\n");
       }
       if(strcmp(argv[i],"-t")==0)
       {
         test = true;
-        printf("Only Check Sectors Enabled\n");
+        //printf("Only Check Sectors Enabled\n");
       }
       if((strcmp(argv[i],"-s")==0))
       {
-        printf("Custom Sector Start For EDC/ECC Regen Enabled\n");
+        //printf("Custom Sector Start For EDC/ECC Regen Enabled\n");
         if(i == (argc - 1))
         {
           printf("Error: -s must be followed by a number\n");
@@ -634,13 +634,13 @@ int main(int argc, char **argv)
         if((verbose) && (!test))
         {
           if(mode1)
-            printf("- Mode 1 Sector fixed\n");
+            printf(" - Mode 1 Sector fixed\n");
 
           if(mode2_form1)
-            printf("- Mode 2 Form 1 fixed\n");
+            printf(" - Mode 2 Form 1 fixed\n");
 
           if(mode2_form2)
-            printf("- Mode 2 Form 2 Sector fixed\n");
+            printf(" - Mode 2 Form 2 Sector fixed\n");
         } else if(test) {
           if(mode1)
             printf(" - Mode 1 Sector has invalid EDC/ECC\n");
@@ -661,7 +661,7 @@ int main(int argc, char **argv)
         
         if (write(data_track_fd, buffer2, 2352) != 2352)
         {
-        printf("Error writing sector at LBA: %u\n", lba);
+        printf("\nError writing sector at LBA: %u\n", lba);
         close(data_track_fd);
         return 1;
         }

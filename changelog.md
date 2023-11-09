@@ -36,7 +36,7 @@ Changes:
 
 Changes:
 
-*   Added -t argument, which only reads the file for any sectors with invalid EDC/EEC data. Can be combined with the -v argument ot display each sector with invalid EDC/EEC. 
+*   Added -t argument, which only reads the file for any sectors with invalid EDC/ECC data. Can be combined with the -v argument ot display each sector with invalid EDC/ECC. 
 
 *   [Binmerged](https://github.com/putnam/binmerge) games (which have the data track and all audio tracks as one bin file) now work with EDCRE correctly.
 

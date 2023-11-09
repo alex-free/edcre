@@ -101,17 +101,34 @@ If you want to see more verbose info, and or if you want to update EDC/ECC data 
 *   Provide any additional arguments (up to 2 additional arguments can be specified at once) (optional) (`-v`, `-t`, `-s <sector number>`).
 
 *   Provide the disc image data track bin file as the last argument (which must be argument 1, 2, or 3 depending on how many additional arguments, if any, that you are using) and execute the command, such as:
-    `./edcre" -v "track 01.bin"`
+    `./edcre -v "track 01.bin"`
 
 ### Burning EDCRE Patched Disc Images
 
-I recommend using the latest CDRDAO v1.2.5 which unlike previous versions supports burning EDC Protected PSX games with CD audio tracks correctly using the `generic-mmc-raw` driver. There are pre-built portable releases of a new enough CDRDAO for Linux [available](https://alex-free.github.io/cdrdao). The required command syntax for burning EDCRE patched games is this:
+### CDRTools
 
-`cdrdao write --speed 1 --driver generic-mmc-raw --swap -n --eject yourgame.cue`
+I recommend using the latest CDRTools for burning EDC protected PSX games on Linux. There are pre-built portable releases of a new enough CDRTools for Linux [available](https://alex-free.github.io/cdrtools). Windows versions are available somewhere. The required command syntax for burning EDCRE patched games is this:
 
-Lets breakdown what each of these arguments to CDRDAO do:
+`cdrtools -raw16 --speed=x cuefile=yourgame.cue`
 
-*   `--speed 1` argument sets the writing speed to the slowest your CD burner supports.
+Breakdown what each of these arguments to CDRDAO do:
+
+`-raw16` specifies to burn the cd image without regenerating EDC/ECC data internally.
+
+`--speed=x` specifies the burn speed. Replace `x` with a number.
+
+`cuefile=yourgame.cue` specifies that your using a cue file named `yourgame.cue`. Replace `yourgame.cue` with the game's cue file your burning.
+
+
+### CDRDAO v1.2.5
+
+The latest CDRDAO v1.2.5 also supports burning EDC Protected PSX games with CD audio tracks correctly using the `generic-mmc-raw` driver. There are pre-built portable releases of a new enough CDRDAO for Linux [available](https://alex-free.github.io/cdrdao). The required command syntax for burning EDCRE patched games is this:
+
+`cdrdao write --speed x --driver generic-mmc-raw --swap -n --eject yourgame.cue`
+
+Breakdown what each of these arguments to CDRDAO do:
+
+*   `--speed x` argument sets the writing speed. Replace `x` with a number.
 
 *   `--driver generic-mmc-raw` specifies CDRDAO to use the `generic-mmc-raw` driver, which burns the CD image exactly as it is. The default driver used without specifiying these arguments is the **`generic-mmc` driver, which like the other drivers in CDRDAO will auto-regenerate EDC data as the CD image is burned.** This can change the EDC data read from the burned disc later, which some PSX games use as an additional anti-piracy check which if failed will lock up [the game](https://alex-free.github.io/tonyhax-international/anti-piracy-bypass.html#games-with-edc-protection).
 

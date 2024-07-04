@@ -26,7 +26,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#define VERSION "1.0.6"
+bool use_current_sector_header;
+unsigned char existing_sector_header[4]; // store the existing header of the file
+
 
 #define GF8_PRIM_POLY 0x11d // x^8 + x^4 + x^3 + x^2 + 1
 #define EDC_POLY 0x8001801b // (x^16 + x^15 + x^2 + 1) (x^16 + x^2 + x + 1)
@@ -312,10 +314,22 @@ static uint8_t bin2bcd(uint8_t b)
 // Builds the sector header.
 static void set_sector_header(uint8_t mode, uint32_t adr, uint8_t *sector)
 {
-  sector[LEC_HEADER_OFFSET] = bin2bcd(adr / (60 * 75));
-  sector[LEC_HEADER_OFFSET + 1] = bin2bcd((adr / 75) % 60);
-  sector[LEC_HEADER_OFFSET + 2] = bin2bcd(adr % 75);
-  sector[LEC_HEADER_OFFSET + 3] = mode;
+  if(use_current_sector_header)
+  {
+    sector[LEC_HEADER_OFFSET] = existing_sector_header[0];
+    //printf("existing sector header byte: %02X\n", existing_sector_header[0]);
+    sector[LEC_HEADER_OFFSET + 1] = existing_sector_header[1];
+    //printf("existing sector header byte: %02X\n", existing_sector_header[1]);
+    sector[LEC_HEADER_OFFSET + 2] = existing_sector_header[2];
+    //printf("existing sector header byte: %02X\n", existing_sector_header[2]);
+    sector[LEC_HEADER_OFFSET + 3] = existing_sector_header[3];
+    //printf("existing sector header byte: %02X\n", existing_sector_header[3]);
+  } else {
+    sector[LEC_HEADER_OFFSET] = bin2bcd(adr / (60 * 75));
+    sector[LEC_HEADER_OFFSET + 1] = bin2bcd((adr / 75) % 60);
+    sector[LEC_HEADER_OFFSET + 2] = bin2bcd(adr % 75);
+    sector[LEC_HEADER_OFFSET + 3] = mode;
+  }
 }
 
 // Calculate the P parities for the sector. The 43 P vectors of length 24 are combined with the GF8_P_COEFFS.
@@ -482,8 +496,9 @@ void lec_encode_mode2_form2_sector(uint32_t adr, uint8_t *sector)
 
 void usage() 
 {
-    printf("Usage: edcre <optional arguments> <track 01 bin file>\n\nOptional Arguments:\n\n-v    Verbose, display each sector LBA number containing invalid EDC data, if any.\n\n-t   Test the disc image for sectors that contain invalid EDC/ECC. Does not modify the track bin file in any way.\n\n-s    Start EDC/ECC regeneration at sector number following the -s argument instead of at sector 0. In example, -s 16 starts regeneration at sector 16 (LBA 166) which would be the system volume for a PSX disc image (and what is recommended most of the time). TOCPerfect Patcher users want -s 15 here however.\n");
+    printf("Usage: edcre <optional arguments> <track 01 bin file>\n\nOptional Arguments:\n\n-v    Verbose, display each sector LBA number containing invalid EDC data, if any.\n\n-t   Test the disc image for sectors that contain invalid EDC/ECC. Does not modify the track bin file in any way.\n\n-s    Start EDC/ECC regeneration at sector number following the -s argument instead of at sector 0. In example, -s 16 starts regeneration at sector 16 (LBA 166) which would be the system volume for a PSX disc image (and what is recommended most of the time). TOCPerfect Patcher users want -s 15 here however.\n\n-k   Keep existing sector header data from data file. This prevents EDCRE from regenerating the MM:SS:FF in the sector header. Useful for testing or regenerating EDC/ECC in a disc image file snippet (i.e. the last data track pregap of a Dreamcast GD-ROM image doesn't start at sector 0 and is a separate file).\n");
 }
+
 int main(int argc, char **argv)
 {
   char *data_track_file = 0;
@@ -502,7 +517,7 @@ int main(int argc, char **argv)
   bool mode2_form1 = false;
   bool mode2_form2 = false;
 
-  printf("EDCRE v%s - EDC/ECC Regenerator By Alex Free\nhttps://alex-free.github.io/edcre\nMade Possible By Modifying CDRDAO (GPLv2) Source Code:\nhttps://github.com/cdrdao/cdrdao\n\n", VERSION);
+  printf("EDCRE %s - EDC/ECC Regenerator By Alex Free\nhttps://alex-free.github.io/edcre\nMade Possible By Modifying CDRDAO (GPLv2) Source Code:\nhttps://github.com/cdrdao/cdrdao\n\n", VERSION);
 
   if(argc > 6)
   {
@@ -521,21 +536,35 @@ int main(int argc, char **argv)
         test = true;
         //printf("Only Check Sectors Enabled\n");
       }
+      if(strcmp(argv[1],"-k")==0)
+      {
+        use_current_sector_header = true;
+        printf("Using existing sector header from data file\n");
+      }
       data_track_file = argv[2];
   } else if((argc == 4) || (argc == 5) || (argc == 6)){
 
     for(int i = 1; i < argc; i++)
     {
+
       if(strcmp(argv[i],"-v")==0)
       {
         verbose = true;
         //printf("Verbose Output Enabled\n");
       }
+
       if(strcmp(argv[i],"-t")==0)
       {
         test = true;
         //printf("Only Check Sectors Enabled\n");
       }
+
+      if(strcmp(argv[i],"-k")==0)
+      {
+        use_current_sector_header = true;
+        printf("Using existing sector header from data file\n");
+      }
+
       if((strcmp(argv[i],"-s")==0))
       {
         //printf("Custom Sector Start For EDC/ECC Regen Enabled\n");
@@ -596,6 +625,14 @@ int main(int argc, char **argv)
     (buffer1[11] == 0x00)
     ) 
     {
+
+    if(use_current_sector_header)
+    {
+      existing_sector_header[0] = buffer1[12];
+      existing_sector_header[1] = buffer1[13];
+      existing_sector_header[2] = buffer1[14];
+      existing_sector_header[3] = buffer1[15];
+    }
 
      switch (*(buffer1 + 12 + 3))
      {

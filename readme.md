@@ -1,5 +1,3 @@
-# [alex-free.github.io](https://alex-free.github.io)
-
 # EDCRE: EDC/ECC Regenerator For BIN+CUE CD Disc Images
 
 EDCRE provides an advanced solution to detect and or update EDC/ECC data to match any edits done to a data track of a CD image.
@@ -9,10 +7,11 @@ EDCRE provides an advanced solution to detect and or update EDC/ECC data to matc
 ## Table of Contents
 
 * [Downloads](#downloads)
-* [EDC/ECC Data](#edcECC-data)
+* [What Is EDC/ECC Data?](#what-is-edcecc-data)
 * [PSX EDC Anti-Piracy Protection](#psx-edc-anti-piracy-protection)
 * [PSX EDC Protection Workaround With EDCRE](#psx-edc-protection-workaround-with-edcre)
 * [Usage](#usage)
+* [Building](build.md)
 * [License](#license)
 * [Credits](#credits)
 
@@ -23,7 +22,6 @@ EDCRE provides an advanced solution to detect and or update EDC/ECC data to matc
 *   [CDRDAO-PLED](https://alex-free.github.io/cdrdao)
 *   [APrip](https://alex-free.github.io/aprip)
 *   [TOCPerfect Patcher](https://alex-free.github.io/tocperfect)
-
 *   [PS1 DemoSwap Patcher](https://alex-free.github.io/ps1demoswap)
 *	[Tonyhax International](https://alex-free.github.io/tonyhax-international)
 *	[Tonyhax International APv2 Bypass System](https://alex-free.github.io/tonyhax-international/anti-piracy-bypass.html)
@@ -32,18 +30,29 @@ EDCRE provides an advanced solution to detect and or update EDC/ECC data to matc
 
 ## Downloads
 
-### Version 1.0.6 (11/9/2023)
-
-*	[edcre-v1.0.6-windows\_x86](https://github.com/alex-free/edcre/releases/download/v1.0.6/edcre-v1.0.6-windows-x86.zip) _For Windows 95 OSR 2.5 Or Newer (32-bit Windows)_
-*	[edcre-v1.0.6-windows-x86\_64](https://github.com/alex-free/edcre/releases/download/v1.0.6/edcre-v1.0.6-windows-x86_64.zip) _For 64-bit Windows_
-*	[edcre-v1.0.6-linux-x86](https://github.com/alex-free/edcre/releases/download/v1.0.6/edcre-v1.0.6-linux-x86_static.zip) _For x86 Linux Distros_
-*	[edcre-v1.0.6-linux-x86\_64](https://github.com/alex-free/edcre/releases/download/v1.0.6/edcre-v1.0.6-linux-x86_64_static.zip) _For x86_64 Linux Distros_
-*	[edcre-v1.0.6-source](https://github.com/alex-free/edcre/archive/refs/tags/v1.0.6.zip)
+### Version 1.0.7 (7/4/2024)
 
 Changes:
 
-*  More verbosity, sector type info is now displayed.
-*  Added very pretty output text.
+*  Added the ability to use existing sector header data MM:SS:FF while also updating EDC/ECC data (`-k` argument). This is useful for an example like [this use-case](https://github.com/alex-free/edcre/issues/1), where you want to update the EDC/ECC on an 'end part' of an incomplete disc image, without regenerating the MM:SS:FF info in the sector header data from 0.
+
+*   Implemented my [EzRe](https://github.com/alex-free/ezre) build system.
+
+----------------------------------------------------
+
+*	[edcre-v1.0.7-windows-i686-static.zip](https://github.com/alex-free/edcre/releases/download/v1.0.7/edcre-v1.0.7-windows-i686-static.zip) _Portable Release For Windows 95 OSR 2.5 and above, Pentium CPU minimum (32 bit)_
+
+*	[edcre-v1.0.7-windows-x86\_64-static.zip](https://github.com/alex-free/edcre/releases/download/v1.0.7/edcre-v1.0.7-windows-x86_64-static.zip) _Portable Release For x86_64 Windows (64 bit)_
+
+*	[edcre-v1.0.7-linux-i386-static.zip](https://github.com/alex-free/edcre/releases/download/v1.0.7/edcre-v1.0.7-linux-i386-static.zip) _Portable Release For Linux 3.2.0 and above, 386 CPU minimum (32 bit)_
+
+*	[edcre-v1.0.7-linux-i386-static.deb](https://github.com/alex-free/edcre/releases/download/v1.0.7/edcre-v1.0.7-linux-i386-static.deb) _Deb package file For Linux 3.2.0 and above, 386 CPU minimum (32 bit)_
+
+*	[edcre-v1.0.7-linux-x86\_64-static.zip](https://github.com/alex-free/edcre/releases/download/v1.0.7/edcre-v1.0.7-linux-x86_64-static.zip) _Portable Release For x86\_64 Linux 3.2.0 and above (64 bit)_
+
+*	[edcre-v1.0.7-linux-x86\_64-static.deb](https://github.com/alex-free/edcre/releases/download/v1.0.7/edcre-v1.0.7-linux-x86_64-static.deb) _Deb package file for x86_64 Linux 3.2.0 and above (64 bit)_
+
+----------------------------------------------------
 
 [About previous versions](changelog.md).
 
@@ -83,6 +92,8 @@ If you want to see more verbose info, and or if you want to update EDC/ECC data 
 
 `-s    Start EDC/ECC regeneration at sector number following the -s argument instead of at sector 0. In example, -s 16 starts regeneration at sector 16 (LBA 166) which would be the system volume for a PSX disc image (and what is recommended most of the time). TOCPerfect Patcher users want -s 15 here however.`
 
+`-k   Keep existing sector header data from data file. This prevents EDCRE from regenerating the MM:SS:FF in the sector header. Useful for testing or regenerating EDC/ECC in a disc image file snippet (i.e. the last data track pregap of a Dreamcast GD-ROM image doesn't start at sector 0 and is a separate file).`
+
 -----------------------------------------------------
 
 ### Windows
@@ -104,21 +115,6 @@ If you want to see more verbose info, and or if you want to update EDC/ECC data 
     `./edcre -v "track 01.bin"`
 
 ### Burning EDCRE Patched Disc Images
-
-### CDRTools
-
-I recommend using the latest CDRTools for burning EDC protected PSX games on Linux. There are pre-built portable releases of a new enough CDRTools for Linux [available](https://alex-free.github.io/cdrtools). Windows versions are available somewhere. The required command syntax for burning EDCRE patched games is this:
-
-`cdrtools -raw16 --speed=x cuefile=yourgame.cue`
-
-Breakdown what each of these arguments to CDRDAO do:
-
-`-raw16` specifies to burn the cd image without regenerating EDC/ECC data internally.
-
-`--speed=x` specifies the burn speed. Replace `x` with a number.
-
-`cuefile=yourgame.cue` specifies that your using a cue file named `yourgame.cue`. Replace `yourgame.cue` with the game's cue file your burning.
-
 
 ### CDRDAO v1.2.5
 

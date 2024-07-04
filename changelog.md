@@ -1,5 +1,20 @@
 # Changelog
 
+## Downloads
+
+## Version 1.0.6 (11/9/2023)
+
+*	[edcre-v1.0.6-windows\_x86](https://github.com/alex-free/edcre/releases/download/v1.0.6/edcre-v1.0.6-windows-x86.zip) _For Windows 95 OSR 2.5 Or Newer (32-bit Windows)_
+*	[edcre-v1.0.6-windows-x86\_64](https://github.com/alex-free/edcre/releases/download/v1.0.6/edcre-v1.0.6-windows-x86_64.zip) _For 64-bit Windows_
+*	[edcre-v1.0.6-linux-x86](https://github.com/alex-free/edcre/releases/download/v1.0.6/edcre-v1.0.6-linux-x86_static.zip) _For x86 Linux Distros_
+*	[edcre-v1.0.6-linux-x86\_64](https://github.com/alex-free/edcre/releases/download/v1.0.6/edcre-v1.0.6-linux-x86_64_static.zip) _For x86_64 Linux Distros_
+*	[edcre-v1.0.6-source](https://github.com/alex-free/edcre/archive/refs/tags/v1.0.6.zip)
+
+Changes:
+
+*  More verbosity, sector type info is now displayed.
+*  Added very pretty output text.
+
 ## Version 1.0.5 (10/26/2023)
 
 *	[edcre-v1.0.5-windows\_x86](https://github.com/alex-free/edcre/releases/download/v1.0.5/edcre-v1.0.5-windows-x86.zip) _For Windows 95 OSR 2.5 Or Newer (32-bit Windows)_

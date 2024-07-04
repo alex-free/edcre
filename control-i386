@@ -1,0 +1,6 @@
+Package: edcre
+Version: 1.0.7
+Maintainer: Alex Free
+Architecture: i386
+Homepage: https://alex-free.github.io/edcre
+Description: EDC/ECC regenerator for edited CD images.

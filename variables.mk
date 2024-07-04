@@ -12,7 +12,7 @@ WINDOWS_X86_64_RELEASE_NAME_SUFFIX=windows-x86_64-static
 # Release file format is $(RELEASE_BASE_NAME)-$(VERSION)-$(RELEASE_NAME_SUFFIX)
 
 # Files included in all portable releases (.zip)
-RELEASE_FILES=readme.md changelog.md license.md
+RELEASE_FILES=readme.md changelog.md license.md images
 # OPTIONAL: files included only in the Linux portable releases (.zip)
 LINUX_SPECIFIC_RELEASE_FILES=
 # OPTIONAL: files included only in the Windows portable releases (.zip)

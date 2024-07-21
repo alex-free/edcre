@@ -494,6 +494,23 @@ void lec_encode_mode2_form2_sector(uint32_t adr, uint8_t *sector)
   set_sector_header(2, adr, sector);
 }
 
+int is_file (char *arg)
+{
+  int opening_test;
+
+  FILE *file = fopen (arg, "rb");
+  if (file == NULL)
+  {
+    opening_test = 1; // this is not a file
+  }
+  else
+  {
+    opening_test = 0; // this is a file
+  }
+
+  return opening_test;
+}
+
 void usage() 
 {
     printf("Usage: edcre <optional arguments> <track 01 bin file>\n\nOptional Arguments:\n\n-v    Verbose, display each sector LBA number containing invalid EDC data, if any.\n\n-t   Test the disc image for sectors that contain invalid EDC/ECC. Does not modify the track bin file in any way.\n\n-s    Start EDC/ECC regeneration at sector number following the -s argument instead of at sector 0. In example, -s 16 starts regeneration at sector 16 (LBA 166) which would be the system volume for a PSX disc image (and what is recommended most of the time). TOCPerfect Patcher users want -s 15 here however.\n\n-k   Keep existing sector header data from data file. This prevents EDCRE from regenerating the MM:SS:FF in the sector header. Useful for testing or regenerating EDC/ECC in a disc image file snippet (i.e. the last data track pregap of a Dreamcast GD-ROM image doesn't start at sector 0 and is a separate file).\n");
@@ -552,9 +569,24 @@ int main(int argc, char **argv)
       }
 
       /* syntax error handling */
-      if((strcmp(argv[i],"-s")==0) && (i >= (argc - 2)))
+      if((strcmp(argv[i],"-v")==0) && (i == (argc - 1)) && (is_file (argv[i]) == 1))
       {
-        printf("Error: -s must be followed by a number then a file\n");
+        fprintf(stderr, "Error: -v must be followed by a file\n");
+        return 1;
+      }
+      if((strcmp(argv[i],"-t")==0) && (i == (argc - 1)) && (is_file (argv[i]) == 1))
+      {
+        fprintf(stderr, "Error: -t must be followed by a file\n");
+        return 1;
+      }
+      if((strcmp(argv[i],"-k")==0) && (i == (argc - 1)) && (is_file (argv[i]) == 1))
+      {
+        fprintf(stderr, "Error: -k must be followed by a file\n");
+        return 1;
+      }
+      if((strcmp(argv[i],"-s")==0) && (i >= (argc - 2)) && (is_file (argv[i]) == 1))
+      {
+        fprintf(stderr, "Error: -s must be followed by a number then a file\n");
         return 1;
       }
     }

@@ -506,6 +506,7 @@ int is_file (char *arg)
   else
   {
     opening_test = 0; // this is a file
+    fclose (file);
   }
 
   return opening_test;

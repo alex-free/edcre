@@ -494,6 +494,24 @@ void lec_encode_mode2_form2_sector(uint32_t adr, uint8_t *sector)
   set_sector_header(2, adr, sector);
 }
 
+int is_file (char *arg)
+{
+  int opening_test;
+
+  FILE *file = fopen (arg, "rb");
+  if (file == NULL)
+  {
+    opening_test = 1; // this is not a file
+  }
+  else
+  {
+    opening_test = 0; // this is a file
+    fclose (file);
+  }
+
+  return opening_test;
+}
+
 void usage() 
 {
     printf("Usage: edcre <optional arguments> <track 01 bin file>\n\nOptional Arguments:\n\n-v    Verbose, display each sector LBA number containing invalid EDC data, if any.\n\n-t   Test the disc image for sectors that contain invalid EDC/ECC. Does not modify the track bin file in any way.\n\n-s    Start EDC/ECC regeneration at sector number following the -s argument instead of at sector 0. In example, -s 16 starts regeneration at sector 16 (LBA 166) which would be the system volume for a PSX disc image (and what is recommended most of the time). TOCPerfect Patcher users want -s 15 here however.\n\n-k   Keep existing sector header data from data file. This prevents EDCRE from regenerating the MM:SS:FF in the sector header. Useful for testing or regenerating EDC/ECC in a disc image file snippet (i.e. the last data track pregap of a Dreamcast GD-ROM image doesn't start at sector 0 and is a separate file).\n");
@@ -519,65 +537,61 @@ int main(int argc, char **argv)
 
   printf("EDCRE %s - EDC/ECC Regenerator By Alex Free\nhttps://alex-free.github.io/edcre\nMade Possible By Modifying CDRDAO (GPLv2) Source Code:\nhttps://github.com/cdrdao/cdrdao\n\n", VERSION);
 
-  if(argc > 6)
+  if(argc < 2)
   {
     usage();
     return 1;
-  } else if(argc == 2) {
-      data_track_file = argv[1];
-  } else if(argc == 3) {
-      if(strcmp(argv[1],"-v")==0)
-      {
-        verbose = true;
-        //printf("Verbose Output Enabled\n");
-      }
-      if(strcmp(argv[1],"-t")==0)
-      {
-        test = true;
-        //printf("Only Check Sectors Enabled\n");
-      }
-      if(strcmp(argv[1],"-k")==0)
-      {
-        use_current_sector_header = true;
-        printf("Using existing sector header from data file\n");
-      }
-      data_track_file = argv[2];
-  } else if((argc == 4) || (argc == 5) || (argc == 6)){
+  } else if(argc < 8) {
 
     for(int i = 1; i < argc; i++)
     {
-
-      if(strcmp(argv[i],"-v")==0)
+      /* feature activation handling */
+      if((strcmp(argv[i],"-v")==0) && (i < (argc - 1)))
       {
         verbose = true;
         //printf("Verbose Output Enabled\n");
       }
-
-      if(strcmp(argv[i],"-t")==0)
+      if((strcmp(argv[i],"-t")==0) && (i < (argc - 1)))
       {
         test = true;
         //printf("Only Check Sectors Enabled\n");
       }
-
-      if(strcmp(argv[i],"-k")==0)
+      if((strcmp(argv[i],"-k")==0) && (i < (argc - 1)))
       {
         use_current_sector_header = true;
         printf("Using existing sector header from data file\n");
       }
-
-      if((strcmp(argv[i],"-s")==0))
+      if((strcmp(argv[i],"-s")==0) && (i < (argc - 2)))
       {
+        custom_sector_edc_start = true;
         //printf("Custom Sector Start For EDC/ECC Regen Enabled\n");
-        if(i == (argc - 1))
-        {
-          printf("Error: -s must be followed by a number\n");
-          return 1;
-        }
+
         lba = strtoul(argv[i + 1], NULL, 0); // next argument
-        custom_sector_edc_start = true;  
+      }
+
+      /* syntax error handling */
+      if((strcmp(argv[i],"-v")==0) && (i == (argc - 1)) && (is_file (argv[i]) == 1))
+      {
+        fprintf(stderr, "Error: -v must be followed by a file\n");
+        return 1;
+      }
+      if((strcmp(argv[i],"-t")==0) && (i == (argc - 1)) && (is_file (argv[i]) == 1))
+      {
+        fprintf(stderr, "Error: -t must be followed by a file\n");
+        return 1;
+      }
+      if((strcmp(argv[i],"-k")==0) && (i == (argc - 1)) && (is_file (argv[i]) == 1))
+      {
+        fprintf(stderr, "Error: -k must be followed by a file\n");
+        return 1;
+      }
+      if((strcmp(argv[i],"-s")==0) && (i >= (argc - 2)) && (is_file (argv[i]) == 1))
+      {
+        fprintf(stderr, "Error: -s must be followed by a number then a file\n");
+        return 1;
       }
     }
-    
+
     data_track_file = argv[(argc - 1)]; // last argument
 
   } else {

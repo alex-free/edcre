@@ -1,8 +1,8 @@
 # EDCRE: EDC/ECC Regenerator For BIN+CUE CD Disc Images
 
-EDCRE provides an advanced solution to detect and or update EDC/ECC data to match any edits done to a data track of a CD image.
+An advanced solution to detect and or update EDC/ECC data to match any edits done to the data track of a BIN/CUE CD image.
 
-![EDCRE](images/edcre.png)
+| [Homepage](https://alex-free.github.io/edcre) | [Github](https://github.com/alex-free/edcre) |
 
 ## Table of Contents
 
@@ -15,46 +15,39 @@ EDCRE provides an advanced solution to detect and or update EDC/ECC data to matc
 * [License](#license)
 * [Credits](#credits)
 
-## Links
-
-*	[Homepage](https://alex-free.github.io/edcre)
-*	[Github](https://github.com/alex-free/edcre)
-*   [CDRDAO-PLED](https://alex-free.github.io/cdrdao)
-*   [APrip](https://alex-free.github.io/aprip)
-*   [TOCPerfect Patcher](https://alex-free.github.io/tocperfect)
-*   [PS1 DemoSwap Patcher](https://alex-free.github.io/ps1demoswap)
-*	[Tonyhax International](https://alex-free.github.io/tonyhax-international)
-*	[Tonyhax International APv2 Bypass System](https://alex-free.github.io/tonyhax-international/anti-piracy-bypass.html)
-*   [The Ultimate Guide To PSX CD-Rs](https://alex-free.github.io/psx-cdr)
-
-
 ## Downloads
 
-### Version 1.0.7 (7/4/2024)
+### Version 1.0.8 (7/31/2024)
 
 Changes:
 
-*  Added the ability to use existing sector header data MM:SS:FF while also updating EDC/ECC data (`-k` argument). This is useful for an example like [this use-case](https://github.com/alex-free/edcre/issues/1), where you want to update the EDC/ECC on an 'end part' of an incomplete disc image, without regenerating the MM:SS:FF info in the sector header data from 0.
+*  Improved argument handling (thanks [@jonblau](https://github.com/jonblau) for the [first implementation](https://github.com/alex-free/edcre/pull/2)!).
 
-*   Implemented my [EzRe](https://github.com/alex-free/ezre) build system.
+*  Scan progress is now displayed as a percentage in real time.
 
-----------------------------------------------------
+*   Optimized and cleaned up code.
 
-*	[edcre-v1.0.7-windows-i686-static.zip](https://github.com/alex-free/edcre/releases/download/v1.0.7/edcre-v1.0.7-windows-i686-static.zip) _Portable Release For Windows 95 OSR 2.5 and above, Pentium CPU minimum (32 bit)_
+*   LBA is provided if not using the `-k` argument in ouput information. Sector number (starting from sector 0 at the begining of the input file) is always provided, even with `-k`.
 
-*	[edcre-v1.0.7-windows-x86\_64-static.zip](https://github.com/alex-free/edcre/releases/download/v1.0.7/edcre-v1.0.7-windows-x86_64-static.zip) _Portable Release For x86_64 Windows (64 bit)_
-
-*	[edcre-v1.0.7-linux-i386-static.zip](https://github.com/alex-free/edcre/releases/download/v1.0.7/edcre-v1.0.7-linux-i386-static.zip) _Portable Release For Linux 3.2.0 and above, 386 CPU minimum (32 bit)_
-
-*	[edcre-v1.0.7-linux-i386-static.deb](https://github.com/alex-free/edcre/releases/download/v1.0.7/edcre-v1.0.7-linux-i386-static.deb) _Deb package file For Linux 3.2.0 and above, 386 CPU minimum (32 bit)_
-
-*	[edcre-v1.0.7-linux-x86\_64-static.zip](https://github.com/alex-free/edcre/releases/download/v1.0.7/edcre-v1.0.7-linux-x86_64-static.zip) _Portable Release For x86\_64 Linux 3.2.0 and above (64 bit)_
-
-*	[edcre-v1.0.7-linux-x86\_64-static.deb](https://github.com/alex-free/edcre/releases/download/v1.0.7/edcre-v1.0.7-linux-x86_64-static.deb) _Deb package file for x86_64 Linux 3.2.0 and above (64 bit)_
+*   Number of mode 1, mode 2 form 1, and mode 2 form 2 sectors scanned is displayed in the scan report.
 
 ----------------------------------------------------
 
-[About previous versions](changelog.md).
+*	[edcre-v1.0.8-windows-i686-static.zip](https://github.com/alex-free/edcre/releases/download/v1.0.8/edcre-v1.0.8-windows-i686-static.zip) _Portable Release For Windows 95 OSR 2.5 and above, Pentium CPU minimum (32 bit)_
+
+*	[edcre-v1.0.8-windows-x86\_64-static.zip](https://github.com/alex-free/edcre/releases/download/v1.0.8/edcre-v1.0.8-windows-x86_64-static.zip) _Portable Release For x86_64 Windows (64 bit)_
+
+*	[edcre-v1.0.8-linux-i386-static.zip](https://github.com/alex-free/edcre/releases/download/v1.0.8/edcre-v1.0.8-linux-i386-static.zip) _Portable Release For Linux 3.2.0 and above, 386 CPU minimum (32 bit)_
+
+*	[edcre-v1.0.8-linux-i386-static.deb](https://github.com/alex-free/edcre/releases/download/v1.0.8/edcre-v1.0.8-linux-i386-static.deb) _Deb package file For Linux 3.2.0 and above, 386 CPU minimum (32 bit)_
+
+*	[edcre-v1.0.8-linux-x86\_64-static.zip](https://github.com/alex-free/edcre/releases/download/v1.0.8/edcre-v1.0.8-linux-x86_64-static.zip) _Portable Release For x86\_64 Linux 3.2.0 and above (64 bit)_
+
+*	[edcre-v1.0.8-linux-x86\_64-static.deb](https://github.com/alex-free/edcre/releases/download/v1.0.8/edcre-v1.0.8-linux-x86_64-static.deb) _Deb package file for x86_64 Linux 3.2.0 and above (64 bit)_
+
+----------------------------------------------------
+
+[Previous versions](changelog.md).
 
 ## What Is EDC/ECC Data?
 
@@ -82,17 +75,19 @@ EDCRE is a command line program. On Windows and most Linux distributions, you ca
 
 If you want to see more verbose info, and or if you want to update EDC/ECC data for all sectors (what you probably want if the data track bin file is not an EDC Protected PSX game but rather something else), you need to execute `edcre` with command line options:
 
-`Usage: edcre <optional arguments> <track 01 bin file>`
+Usage: edcre <optional arguments> <input file>
 
-`Optional Arguments:`
+<input file>      The data track bin file. This is the first (i.e. track 01) or only bin file in a bin/cue cd image
 
-`-v    Verbose, display each sector LBA number containing invalid EDC data, if any.`
+Optional Arguments:
 
-`-t   Test the disc image for sectors that contain invalid EDC/ECC. Does not modify the track bin file in any way.`
+-v    Verbose, display each sector LBA number containing invalid EDC data, if any.
 
-`-s    Start EDC/ECC regeneration at sector number following the -s argument instead of at sector 0. In example, -s 16 starts regeneration at sector 16 (LBA 166) which would be the system volume for a PSX disc image (and what is recommended most of the time). TOCPerfect Patcher users want -s 15 here however.`
+-t   Test the disc image for sectors that contain invalid EDC/ECC. Does not modify the data track bin file in any way.
 
-`-k   Keep existing sector header data from data file. This prevents EDCRE from regenerating the MM:SS:FF in the sector header. Useful for testing or regenerating EDC/ECC in a disc image file snippet (i.e. the last data track pregap of a Dreamcast GD-ROM image doesn't start at sector 0 and is a separate file).`
+-s    Start EDC/ECC regeneration at sector number following the -s argument instead of at sector 0. In example, -s 16 starts regeneration at sector 16 (LBA 166) which would be the system volume for a PSX disc image (and what is recommended most of the time). TOCPerfect Patcher users want -s 15 here however.
+
+-k   Keep existing sector header data from data file. This prevents EDCRE from regenerating the MM:SS:FF in the sector header. Useful for testing or regenerating EDC/ECC in a disc image file snippet (i.e. the last data track pregap of a Dreamcast GD-ROM image doesn't start at sector 0 and is a separate file).`
 
 -----------------------------------------------------
 
@@ -100,7 +95,7 @@ If you want to see more verbose info, and or if you want to update EDC/ECC data 
 
 *   Start cmd.exe and provide the executable file.
 
-*   Provide any additional arguments (`-v`, `-t` `-s <sector number>`).
+*   Provide any additional arguments (`-v`, `-t` `-s <sector number>`, `-k`).
 
 *   Provide the disc image data track bin file as the last argument (which must be argument 1, 2, or 3 depending on how many additional arguments, if any, that you are using) and execute the command, such as:
     `edcre.exe -v "track 01.bin"`
@@ -109,10 +104,12 @@ If you want to see more verbose info, and or if you want to update EDC/ECC data 
 
 *   Start Terminal and provide the executable file.
 
-*   Provide any additional arguments (up to 2 additional arguments can be specified at once) (optional) (`-v`, `-t`, `-s <sector number>`).
+*   Provide any additional arguments (`-v`, `-t` `-s <sector number>`, `-k`).
 
 *   Provide the disc image data track bin file as the last argument (which must be argument 1, 2, or 3 depending on how many additional arguments, if any, that you are using) and execute the command, such as:
     `./edcre -v "track 01.bin"`
+
+![EDCRE](images/edcre.png)
 
 ### Burning EDCRE Patched Disc Images
 

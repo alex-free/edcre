@@ -2,6 +2,28 @@
 
 ## Downloads
 
+## Version 1.0.7 (7/4/2024)
+
+Changes:
+
+*  Added the ability to use existing sector header data MM:SS:FF while also updating EDC/ECC data (`-k` argument). This is useful for an example like [this use-case](https://github.com/alex-free/edcre/issues/1), where you want to update the EDC/ECC on an 'end part' of an incomplete disc image, without regenerating the MM:SS:FF info in the sector header data from 0.
+
+*   Implemented my [EzRe](https://github.com/alex-free/ezre) build system.
+
+----------------------------------------------------
+
+*	[edcre-v1.0.7-windows-i686-static.zip](https://github.com/alex-free/edcre/releases/download/v1.0.7/edcre-v1.0.7-windows-i686-static.zip) _Portable Release For Windows 95 OSR 2.5 and above, Pentium CPU minimum (32 bit)_
+
+*	[edcre-v1.0.7-windows-x86\_64-static.zip](https://github.com/alex-free/edcre/releases/download/v1.0.7/edcre-v1.0.7-windows-x86_64-static.zip) _Portable Release For x86_64 Windows (64 bit)_
+
+*	[edcre-v1.0.7-linux-i386-static.zip](https://github.com/alex-free/edcre/releases/download/v1.0.7/edcre-v1.0.7-linux-i386-static.zip) _Portable Release For Linux 3.2.0 and above, 386 CPU minimum (32 bit)_
+
+*	[edcre-v1.0.7-linux-i386-static.deb](https://github.com/alex-free/edcre/releases/download/v1.0.7/edcre-v1.0.7-linux-i386-static.deb) _Deb package file For Linux 3.2.0 and above, 386 CPU minimum (32 bit)_
+
+*	[edcre-v1.0.7-linux-x86\_64-static.zip](https://github.com/alex-free/edcre/releases/download/v1.0.7/edcre-v1.0.7-linux-x86_64-static.zip) _Portable Release For x86\_64 Linux 3.2.0 and above (64 bit)_
+
+*	[edcre-v1.0.7-linux-x86\_64-static.deb](https://github.com/alex-free/edcre/releases/download/v1.0.7/edcre-v1.0.7-linux-x86_64-static.deb) _Deb package file for x86_64 Linux 3.2.0 and above (64 bit)_
+
 ## Version 1.0.6 (11/9/2023)
 
 *	[edcre-v1.0.6-windows\_x86](https://github.com/alex-free/edcre/releases/download/v1.0.6/edcre-v1.0.6-windows-x86.zip) _For Windows 95 OSR 2.5 Or Newer (32-bit Windows)_

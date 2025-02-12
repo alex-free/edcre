@@ -12,38 +12,40 @@ An advanced solution to detect and or update EDC/ECC data to match any edits don
 * [PSX EDC Protection Workaround With EDCRE](#psx-edc-protection-workaround-with-edcre)
 * [Usage](#usage)
 * [Building](build.md)
-* [License](#license)
+* [License](license.md)
 * [Credits](#credits)
 
 ## Downloads
 
-### Version 1.0.8 (7/31/2024)
+### Version 1.0.9 (2/11/2025)
 
 Changes:
 
-*  Improved argument handling (thanks [@jonblau](https://github.com/jonblau) for the [first implementation](https://github.com/alex-free/edcre/pull/2)!).
+* Fixed Windows builds, closing [issue #3](https://github.com/alex-free/edcre/issues/3).
 
-*  Scan progress is now displayed as a percentage in real time.
+* For all operating systems, if test only mode is given (`-t`) then the input file is opened as read only, which is more correct. Otherwise it is open as read write so that EDC/ECC can be updated if needed.
 
-*   Optimized and cleaned up code.
+* The verbose (`-v`) argument now displays which sectors/lbas are invalid, if any are. Without specifying verbose mode, it is no longer printed by default which exact sectors need updating of EDC/ECC and you just get the scan report at the end saying how many were. This is more consistent with how verbose mode already only displays which sectors/lbas were fixed, rather then just a sum of how many in the scan report.
 
-*   LBA is provided if not using the `-k` argument in ouput information. Sector number (starting from sector 0 at the begining of the input file) is always provided, even with `-k`.
-
-*   Number of mode 1, mode 2 form 1, and mode 2 form 2 sectors scanned is displayed in the scan report.
+* Updated EzRe build system to v1.0.3. RPM package files are now generated for i386 and x86_64 Linux.
 
 ----------------------------------------------------
 
-*	[edcre-v1.0.8-windows-i686-static.zip](https://github.com/alex-free/edcre/releases/download/v1.0.8/edcre-v1.0.8-windows-i686-static.zip) _Portable Release For Windows 95 OSR 2.5 and above, Pentium CPU minimum (32 bit)_
+*	[edcre-v1.0.9-windows-i686-static.zip](https://github.com/alex-free/edcre/releases/download/v1.0.9/edcre-v1.0.9-windows-i686-static.zip) _Portable Release For Windows 95 OSR 2.5 and above, Pentium CPU minimum (32 bit)_
 
-*	[edcre-v1.0.8-windows-x86\_64-static.zip](https://github.com/alex-free/edcre/releases/download/v1.0.8/edcre-v1.0.8-windows-x86_64-static.zip) _Portable Release For x86_64 Windows (64 bit)_
+*	[edcre-v1.0.9-windows-x86\_64-static.zip](https://github.com/alex-free/edcre/releases/download/v1.0.9/edcre-v1.0.9-windows-x86_64-static.zip) _Portable Release For x86_64 Windows (64 bit)_
 
-*	[edcre-v1.0.8-linux-i386-static.zip](https://github.com/alex-free/edcre/releases/download/v1.0.8/edcre-v1.0.8-linux-i386-static.zip) _Portable Release For Linux 3.2.0 and above, 386 CPU minimum (32 bit)_
+*	[edcre-v1.0.9-linux-i386-static.zip](https://github.com/alex-free/edcre/releases/download/v1.0.9/edcre-v1.0.9-linux-i386-static.zip) _Portable Release For Linux 3.2.0 and above, 386 CPU minimum (32 bit)_
 
-*	[edcre-v1.0.8-linux-i386-static.deb](https://github.com/alex-free/edcre/releases/download/v1.0.8/edcre-v1.0.8-linux-i386-static.deb) _Deb package file For Linux 3.2.0 and above, 386 CPU minimum (32 bit)_
+*	[edcre-v1.0.9-linux-i386-static.deb](https://github.com/alex-free/edcre/releases/download/v1.0.9/edcre-v1.0.9-linux-i386-static.deb) _Deb package file For Linux 3.2.0 and above, 386 CPU minimum (32 bit)_
 
-*	[edcre-v1.0.8-linux-x86\_64-static.zip](https://github.com/alex-free/edcre/releases/download/v1.0.8/edcre-v1.0.8-linux-x86_64-static.zip) _Portable Release For x86\_64 Linux 3.2.0 and above (64 bit)_
+*	[edcre-1.0.9-1.fc41.i386.rpm](https://github.com/alex-free/edcre/releases/download/v1.0.9/edcre-1.0.9-1.fc41.i386.rpm) _RPM package file For i386 Linux 3.2.0 and above (32 bit)_
 
-*	[edcre-v1.0.8-linux-x86\_64-static.deb](https://github.com/alex-free/edcre/releases/download/v1.0.8/edcre-v1.0.8-linux-x86_64-static.deb) _Deb package file for x86_64 Linux 3.2.0 and above (64 bit)_
+*	[edcre-v1.0.9-linux-x86\_64-static.zip](https://github.com/alex-free/edcre/releases/download/v1.0.9/edcre-v1.0.9-linux-x86_64-static.zip) _Portable Release For x86\_64 Linux 3.2.0 and above (64 bit)_
+
+*	[edcre-v1.0.9-linux-x86\_64-static.deb](https://github.com/alex-free/edcre/releases/download/v1.0.9/edcre-v1.0.9-linux-x86_64-static.deb) _Deb package file for x86_64 Linux 3.2.0 and above (64 bit)_
+
+*	[edcre-1.0.9-1.fc41.x86_64.rpm](https://github.com/alex-free/edcre/releases/download/v1.0.9/edcre-1.0.9-1.fc41.x86_64.rpm) _RPM package file For x86_64 Linux 3.2.0 and above (64 bit)_
 
 ----------------------------------------------------
 
@@ -51,15 +53,23 @@ Changes:
 
 ## What Is EDC/ECC Data?
 
-EDC is a special checksum that verifies the integrity of the user data portion of a sector in a data track. If during a sector read the EDC does not match the data read by the CD drive, ECC data then provides a way to correct the data to what was expected in most cases. If a significant amount of the sector is unreadable or modified this may not be correctable with ECC data, but in many common cases (i.e. slightly scratched discs) it does work quite well and provides much more reliability and resilience for data CD reading. 
+EDC (Error Detection Code) is a checksum that verifies the integrity of the user data portion of a sector in a data track. If during a sector read the EDC does not match the data read by the CD drive, ECC (Error Correction Code) data then provides a way to correct the data to what was expected in most cases. 
 
-When you edit a data track in a CD image, the original EDC and ECC will remain untouched causing it to mismatch the new contents of the user data in any modified sectors, causing any changes to not take effect or invalidate the disc image when it is burned to a disc and used on real hardware. Usually this isn't a problem however since almost all CD burning software writes updated EDC/ECC to burned discs, and most emulators ignore the EDC/ECC data in sectors by design. [IMGBurn](https://www.imgburn.com/) always writes updated EDC/ECC data, and there isn't a way to disable that behavior. [CDRDAO](https://github.com/cdrdao/cdrdao) always writes updated EDC/ECC data when using the default `generic-mmc` driver. It is possible however specify the `generic-mmc-raw` be used instead which **does not modify EDC/ECC data and leaves it as is**. [CloneCD](https://www.redfox.bz/en/clonecd.html) always writes updated EDC/ECC data **unless you use the RAW writing mode**. Writing updated EDC data to disc is usually what you want, that way the correct matching EDC/ECC data correlates to any modification to the user data of sectors found in a disc image. 
+If a significant amount of the sector is unreadable (due to scratches and or drive issues), or a significant amount of the user data was modified without updating the EDC/ECC as well, the system falls apart but it does work quite well and provides much more reliability and resilience for data CD reading. 
 
-But what if you want to edit user data of sectors in a data track of a CD disc image and then write it raw? That is exactly what I want to do, as it defeats the EDC-based anti-piracy protection measure found in almost all of the [Dance Dance Revolution PSX games](https://alex-free.github.io/aprip#edc).
+When you edit a data track in a CD image (using a patcher, hex editor, etc.), the original EDC and ECC will remain untouched (unless i.e. the patcher supports updating them as well) causing it to mismatch the new contents of the user data in any modified sectors, causing any changes to not take effect or invalidate the disc image when it is burned to a disc and used on real hardware. Usually this isn't a problem since almost all CD burning software writes updated EDC/ECC to burned discs on the fly based on the data in the user data portion of the sector. Most emulators also ignore the EDC/ECC data in sectors by design as an optimization/feature. 
+
+* [IMGBurn](https://www.imgburn.com/) always writes updated EDC/ECC data, and there isn't a way to disable that behavior. 
+
+* [CDRDAO](https://github.com/cdrdao/cdrdao) always writes updated EDC/ECC data when using the default `generic-mmc` driver. It is possible however specify the `generic-mmc-raw` be used instead which **does not modify EDC/ECC data and leaves it as is**. 
+
+* [CloneCD](https://www.redfox.bz/en/clonecd.html) always writes updated EDC/ECC data **unless you use the RAW writing mode**. Writing updated EDC data to disc is usually what you want, that way the correct matching EDC/ECC data correlates to any modification to the user data of sectors found in a disc image. 
+
+But what if you want to edit user data of sectors in a data track of a CD disc image and then write it raw? That is exactly what I want to do to defeats the EDC-based anti-piracy protection measure found in almost all of the [Dance Dance Revolution PSX games](https://alex-free.github.io/aprip#edc).
 
 ## PSX EDC Anti-Piracy Protection
 
-The idea of EDC/ECC based additional anti-piracy protection is a brilliantly flawed one. See, Sony's tools to generate disc images back in the day were [buggy](http://www.psxdev.net/forum/viewtopic.php?t=1475). One such bug appears to be that the [reserved sectors 12-15](http://problemkaputt.de/psx-spx.htm#cdromisovolumedescriptors), which are zero filled in the user data portion of the sector, _also_ **have an EDC checksum of zero**. The correct checksum for a zero-filled user data sector _should be_ `3F 13 B0 BE`, _but it isn't_. It's `00 00 00 00` like the rest of the sector besides the sync data. This actually doesn't matter in practice, so the bug went unoticed and the technically invalid sector 12-15s shipped on real licensed PSX CD-ROMs. This apparently got fixed eventually in some newer version of the `cdgen` Sony tool that created disc images.
+The idea of EDC/ECC based additional anti-piracy protection is a brilliantly flawed one. See, Sony's tools to generate disc images back in the day were [buggy](http://www.psxdev.net/forum/viewtopic.php?t=1475). One such bug appears to be that the [reserved sectors 12-15](http://problemkaputt.de/psx-spx.htm#cdromisovolumedescriptors), which are zero filled in the user data portion of the sector, _also_ **have an EDC checksum of zero**. The correct checksum for a zero-filled user data sector _should be_ `3F 13 B0 BE`, _but it isn't_. It's `00 00 00 00` like the rest of the sector besides the sync data. This actually doesn't matter in practice, so the bug went un-noticed and the technically invalid sector 12-15s shipped on real licensed PSX CD-ROMs.
 
 Someone working on the Dance Dance Revolution PSX games noticed this strange behavior and figured out that it could be exploited as an additional anti-piracy protection measure. If the real licensed PSX CD-ROM discs were shipped with an EDC checksum of zero in sector 12-15, then when someone went to rip the real licensed PSX CD-ROM disc and then burn it back to a CD-R, the EDC checksum in sector 12-15 would no longer be `00 00 00 00`, it would be the expected `3F 13 B0 BE`. [Game code](https://github.com/socram8888/tonyhax/issues/121#issuecomment-1341381549) can read the EDC checksum on the disc at sector 12, and a routine could then lock up the game if the EDC data is non-zero to deter piracy.
 
@@ -131,12 +141,10 @@ Breakdown what each of these arguments to CDRDAO do:
 
 *   `--eject` will automatically eject the disc immediately after a successful burn.
 
-## License
-
-EDCRE is modified [CDRDAO](https://github.com/cdrdao/cdrdao) source code, which is licensed under the GPLv2 license. Please see the file `license.txt` in each release for full info.
-
 ## Credits
 
 *   [CDRDAO](https://github.com/cdrdao/cdrdao) source code.
+
 *   [Socram8888](https://github.com/socram8888) for providing info on [how EDC Protected games detect a corrected EDC checksum](https://github.com/socram8888/tonyhax/issues/121#issuecomment-1341365357).
+
 *   [MottZilla](https://github.com/mottzilla) for coming up with the workaround idea: "Just don't update those sectors" lol.

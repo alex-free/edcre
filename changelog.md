@@ -1,6 +1,32 @@
-# Changelog
+# [EDCRE: EDC/ECC Regenerator For BIN+CUE CD Disc Images](readme.md) -> Changelog
 
-## Downloads
+### Version 1.0.8 (7/31/2024)
+
+Changes:
+
+*  Improved argument handling (thanks [@jonblau](https://github.com/jonblau) for the [first implementation](https://github.com/alex-free/edcre/pull/2)!).
+
+*  Scan progress is now displayed as a percentage in real time.
+
+*   Optimized and cleaned up code.
+
+*   LBA is provided if not using the `-k` argument in ouput information. Sector number (starting from sector 0 at the begining of the input file) is always provided, even with `-k`.
+
+*   Number of mode 1, mode 2 form 1, and mode 2 form 2 sectors scanned is displayed in the scan report.
+
+----------------------------------------------------
+
+*	[edcre-v1.0.8-windows-i686-static.zip](https://github.com/alex-free/edcre/releases/download/v1.0.8/edcre-v1.0.8-windows-i686-static.zip) _Portable Release For Windows 95 OSR 2.5 and above, Pentium CPU minimum (32 bit)_
+
+*	[edcre-v1.0.8-windows-x86\_64-static.zip](https://github.com/alex-free/edcre/releases/download/v1.0.8/edcre-v1.0.8-windows-x86_64-static.zip) _Portable Release For x86_64 Windows (64 bit)_
+
+*	[edcre-v1.0.8-linux-i386-static.zip](https://github.com/alex-free/edcre/releases/download/v1.0.8/edcre-v1.0.8-linux-i386-static.zip) _Portable Release For Linux 3.2.0 and above, 386 CPU minimum (32 bit)_
+
+*	[edcre-v1.0.8-linux-i386-static.deb](https://github.com/alex-free/edcre/releases/download/v1.0.8/edcre-v1.0.8-linux-i386-static.deb) _Deb package file For Linux 3.2.0 and above, 386 CPU minimum (32 bit)_
+
+*	[edcre-v1.0.8-linux-x86\_64-static.zip](https://github.com/alex-free/edcre/releases/download/v1.0.8/edcre-v1.0.8-linux-x86_64-static.zip) _Portable Release For x86\_64 Linux 3.2.0 and above (64 bit)_
+
+*	[edcre-v1.0.8-linux-x86\_64-static.deb](https://github.com/alex-free/edcre/releases/download/v1.0.8/edcre-v1.0.8-linux-x86_64-static.deb) _Deb package file for x86_64 Linux 3.2.0 and above (64 bit)_
 
 ## Version 1.0.7 (7/4/2024)
 

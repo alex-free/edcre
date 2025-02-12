@@ -534,7 +534,7 @@ int main(int argc, char **argv)
     bool mode2_form1 = false;
     bool mode2_form2 = false;
 
-    printf("EDCRE %s - EDC/ECC Regenerator By Alex Free\nhttps://alex-free.github.io/edcre\nMade Possible By Modifying CDRDAO (GPLv2) Source Code:\nhttps://github.com/cdrdao/cdrdao\n\n", VERSION);
+    printf("EDCRE %s - EDC/ECC Regenerator\n(c) 2023-2025 Alex Free (GNU GPLv2)\nhttps://alex-free.github.io/edcre\n\nMade Possible By Modifying CDRDAO (GPLv2) Source Code:\nhttps://github.com/cdrdao/cdrdao\n\n", VERSION);
 
     if( (argc < 2) || (argc > 8) )
     {
@@ -611,11 +611,40 @@ int main(int argc, char **argv)
 
     data_track_file = argv[(argc - 1)]; // last argument
 
-    if((data_track_fd = open(data_track_file, O_RDWR)) < 0)
-    {
-        fprintf(stderr, "Cannot open data track bin file\n");
-        return 1;
-    }
+    // Windows read() implemented by mingw compiler opens in text mode unless you specify O_BINARY. That is specific to Windows and not valid for Linux so we account for it here. See https://stackoverflow.com/a/67707609 .
+    #ifdef WIN32
+        // Open file as read only if only verifying
+        if(test_validity_only)
+        {
+            if((data_track_fd = open(data_track_file, O_RDONLY | O_BINARY)) < 0)
+            {
+                fprintf(stderr, "Cannot open data track bin file\n");
+                return 1;
+            }
+        } else {
+            if((data_track_fd = open(data_track_file, O_RDWR | O_BINARY)) < 0)
+            {
+                fprintf(stderr, "Cannot open data track bin file\n");
+                return 1;
+            }
+        }
+    #else
+        // Open file as read only if only verifying
+        if(test_validity_only)
+        {
+            if((data_track_fd = open(data_track_file, O_RDONLY)) < 0)
+            {
+                fprintf(stderr, "Cannot open data track bin file\n");
+                return 1;
+            }
+        } else {
+            if((data_track_fd = open(data_track_file, O_RDWR)) < 0)
+            {
+                fprintf(stderr, "Cannot open data track bin file\n");
+                return 1;
+            }  
+        }
+    #endif
 
     // Use lseek() to move the file pointer to the end of the file
     file_size = lseek(data_track_fd, 0, SEEK_END);
@@ -729,7 +758,7 @@ int main(int argc, char **argv)
                         printf("\nUpdated sector %u (LBA: %u) (MODE2_FORM2)\n", (lba - pregap), lba);
                     }                
                 }
-            } else if(test_validity_only) {
+            } else if((verbose) && (test_validity_only)) {
                 if(mode1)
                 {
                     if(use_current_sector_header)
@@ -774,7 +803,7 @@ int main(int argc, char **argv)
     }
 
     close(data_track_fd);
-    printf("\n\nScan report:\n************\n");
+    printf("\n\n*************\n*Scan Report*\n*************\n\n");
     printf("%d Mode 1 Sector(s)\n", number_of_mode_1_sectors);
     printf("%d Mode 2 Form 1 Sector(s)\n" , number_of_mode_2_form_1_sectors);
     printf("%d Mode 2 Form 2 Sector(s)\n" , number_of_mode_2_form_2_sectors);
@@ -785,16 +814,16 @@ int main(int argc, char **argv)
         {
             if(test_validity_only)
             {
-                printf("\nFound invalid EDC/ECC data in 1 sector\n");
+                printf("Found invalid EDC/ECC data in 1 sector\n");
             } else {
-                printf("\nUpdated EDC/ECC in 1 sector\n");
+                printf("Updated EDC/ECC in 1 sector\n");
             }
         } else {
             if(test_validity_only)
             {
-                printf("\nFound invalid EDC/ECC in %u sectors\n", number_of_sectors_fixed);
+                printf("Found invalid EDC/ECC in %u sectors\n", number_of_sectors_fixed);
             } else {
-                printf("\nUpdated EDC/ECC in %u sectors\n", number_of_sectors_fixed);
+                printf("Updated EDC/ECC in %u sectors\n", number_of_sectors_fixed);
             }
         }
     } else {

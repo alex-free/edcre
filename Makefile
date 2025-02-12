@@ -1,30 +1,180 @@
-# EzRe GNUMakefile for Linux/Windows by Alex Free https://github.com/alex-free/ezre
+# EzRe v1.0.3 GNUMakefile for Linux/Windows by Alex Free https://github.com/alex-free/ezre
 
 include variables.mk
+
+# Prepend v to version number (i.e. get v1.0 from 1.0).
+VERSION_WITH_V := v$(VERSION)
 
 COMPILER_FLAGS+=-DVERSION=\"$(VERSION)\"
 
 $(PROGRAM): clean
-	mkdir -p $(BUILD_DIR)
-ifeq ($(strip $(EXECUTABLE_NAME)),)
-	$(COMPILER) $(COMPILER_FLAGS) $(SOURCE_FILES) -o $(BUILD_DIR)/$(PROGRAM)
-else
-	$(COMPILER) $(COMPILER_FLAGS) $(SOURCE_FILES) -o $(BUILD_DIR)/$(EXECUTABLE_NAME)
+
+# Check release name info.
+
+ifeq ($(strip $(PROGRAM)),)
+	$(error Error: The $$PROGRAM variable is not set in variables.mk but is required)
 endif
 
-.PHONY: deps-apt
-deps-apt:
-	sudo apt update
-	sudo apt install --yes $(BUILD_DEPENDS_APT)
+ifeq ($(strip $(SOURCE_FILES)),)
+	$(error Error: The $$SOURCE_FILES variable is not set in variables.mk but is required)
+endif
 
-.PHONY: deps-dnf
-deps-dnf:
-	sudo dnf update
-	sudo dnf -y install  $(BUILD_DEPENDS_DNF)
+ifeq ($(strip $(RELEASE_BASE_NAME)),)
+	$(error Error: The $$RELEASE_BASE_NAME variable is not set in variables.mk but is required)
+endif
+
+ifeq ($(strip $(VERSION)),)
+	$(error Error: The $$VERSION variable is not set in variables.mk but is required)
+endif
+
+ifeq ($(strip $(LINUX_I386_RELEASE_NAME_SUFFIX)),)
+	$(error Error: The $$LINUX_I386_RELEASE_NAME_SUFFIX variable is not set in variables.mk but is required)
+endif
+
+ifeq ($(strip $(LINUX_X86_64_RELEASE_NAME_SUFFIX)),)
+	$(error Error: The $$LINUX_X86_64_RELEASE_NAME_SUFFIX variable is not set in variables.mk but is required)
+endif
+
+ifeq ($(strip $(WINDOWS_I686_RELEASE_NAME_SUFFIX)),)
+	$(error Error: The $$WINDOWS_I686_RELEASE_NAME_SUFFIX variable is not set in variables.mk but is required)
+endif
+
+ifeq ($(strip $(WINDOWS_X86_64_RELEASE_NAME_SUFFIX)),)
+	$(error Error: The $$WINDOWS_X86_64_RELEASE_NAME_SUFFIX variable is not set in variables.mk but is required)
+endif
+
+# Check dependencies.
+
+ifeq ($(strip $(BUILD_DEPENDS_APT)),)
+	$(error Error: The $$BUILD_DEPENDS_APT variable is not set in variables.mk but is required)
+endif
+
+ifeq ($(strip $(BUILD_DEPENDS_DNF)),)
+	$(error Error: The $$BUILD_DEPENDS_DNF variable is not set in variables.mk but is required)
+endif
+
+# Check build output.
+
+ifeq ($(strip $(BUILD_DIR)),)
+	$(error Error: The $$BUILD_DIR variable is not set in variables.mk but is required)
+endif
+
+# Check for library compilation.
+
+ifeq ($(strip $(BUILD_LIB)),)
+	$(error Error: The $$BUILD_LIB variable is not set in variables.mk but is required)
+endif
+
+# Check compiler.
+
+ifeq ($(strip $(COMPILER)),)
+	$(error Error: The $$COMPILER variable is not set in variables.mk but is required)
+endif
+
+ifeq ($(strip $(LINUX_COMPILER)),)
+	$(error Error: The $$LINUX_COMPILER variable is not set in variables.mk but is required)
+endif
+
+ifeq ($(strip $(WINDOWS_I686_COMPILER)),)
+	$(error Error: The $$WINDOWS_I686_COMPILER variable is not set in variables.mk but is required)
+endif
+
+ifeq ($(strip $(WINDOWS_X86_64_COMPILER)),)
+	$(error Error: The $$WINDOWS_X86_64_COMPILER variable is not set in variables.mk but is required)
+endif
+
+# Check compiler flags.
+
+ifeq ($(strip $(COMPILER_FLAGS)),)
+	$(error Error: The $$COMPILER_FLAGS variable is not set in variables.mk but is required)
+endif
+
+ifeq ($(strip $(COMPILER_FLAGS_LINUX_I386)),)
+	$(error Error: The $$COMPILER_FLAGS_LINUX_I386 variable is not set in variables.mk but is required)
+endif
+
+# Check ar.
+
+ifeq ($(strip $(AR)),)
+	$(error Error: The $$AR variable is not set in variables.mk but is required)
+endif
+
+ifeq ($(strip $(LINUX_AR)),)
+	$(error Error: The $$LINUX_AR variable is not set in variables.mk but is required)
+endif
+
+ifeq ($(strip $(WINDOWS_I686_AR)),)
+	$(error Error: The $$WINDOWS_I686_AR variable is not set in variables.mk but is required)
+endif
+
+ifeq ($(strip $(WINDOWS_X86_64_AR)),)
+	$(error Error: The $$WINDOWS_X86_64_AR variable is not set in variables.mk but is required)
+endif
+
+# Check strip.
+
+ifeq ($(strip $(STRIP)),)
+	$(error Error: The $$STRIP variable is not set in variables.mk but is required)
+endif
+
+ifeq ($(strip $(LINUX_STRIP)),)
+	$(error Error: The $$LINUX_STRIP variable is not set in variables.mk but is required)
+endif
+
+ifeq ($(strip $(WINDOWS_I686_STRIP)),)
+	$(error Error: The $$WINDOWS_I686_STRIP variable is not set in variables.mk but is required)
+endif
+
+ifeq ($(strip $(WINDOWS_X86_64_STRIP)),)
+	$(error Error: The $$WINDOWS_X86_64_STRIP variable is not set in variables.mk but is required)
+endif
+
+# Begin actual default recipe.
+
+	mkdir -p $(BUILD_DIR)
+
+# OPTIONAL, not default: Build C libraries to be used by the target executable. To enable this, you must replace `library-file*` with the actual name of the library, and you must set `BUILD_LIB=YES` in `variables.mk`.
+ifeq ("$(BUILD_LIB)","YES")
+	$(COMPILER) $(COMPILER_FLAGS_LIB) -c library-files-dir/library-file.c -o $(BUILD_DIR)/library-file-object.o
+	$(AR) rcs $(BUILD_DIR)/library-file-archive.a $(BUILD_DIR)/library-file-object.o
+
+ifeq ($(strip $(EXECUTABLE_NAME)),)
+	$(COMPILER) $(COMPILER_FLAGS) $(SOURCE_FILES) -L./$(BUILD_DIR) -llibrary-file -o $(BUILD_DIR)/$(PROGRAM)
+	$(STRIP) $(BUILD_DIR)/$(PROGRAM)
+else
+	$(COMPILER) $(COMPILER_FLAGS) $(SOURCE_FILES) -L./$(BUILD_DIR) -llibrary-file -o $(BUILD_DIR)/$(EXECUTABLE_NAME)
+	$(STRIP) $(BUILD_DIR)/$(EXECUTABLE_NAME)
+endif
+
+else # Default: Does not build any C libraries. `BUILD_LIB=NO` in `variables.mk`.
+
+ifeq ($(strip $(EXECUTABLE_NAME)),)
+	$(COMPILER) $(COMPILER_FLAGS) $(SOURCE_FILES) -o $(BUILD_DIR)/$(PROGRAM)
+	$(STRIP) $(BUILD_DIR)/$(PROGRAM)
+else
+	$(COMPILER) $(COMPILER_FLAGS) $(SOURCE_FILES) -o $(BUILD_DIR)/$(EXECUTABLE_NAME)
+	$(STRIP) $(BUILD_DIR)/$(EXECUTABLE_NAME)
+endif
+
+endif
+
+.PHONY: deps
+deps:
+	@if command -v dnf > /dev/null; then \
+		echo "Using dnf"; \
+		sudo dnf update; \
+		sudo dnf -y install $(BUILD_DEPENDS_DNF); \
+	elif command -v apt > /dev/null; then \
+		echo "Using apt"; \
+		sudo apt update; \
+		sudo apt install --yes $(BUILD_DEPENDS_APT); \
+	else \
+		echo "Neither dnf nor apt package managers were found. The make deps rule requires one of these package managers to automatically install all required build dependencies."; \
+	fi
 
 .PHONY: clean
 clean:
-	rm -rf $(BUILD_DIR)/$(PROGRAM).exe $(BUILD_DIR)/$(PROGRAM)
+	rm -rf $(BUILD_DIR)/$(PROGRAM).exe $(BUILD_DIR)/$(PROGRAM) $(BUILD_DIR)/*.o $(BUILD_DIR)/*.a
 
 .PHONY: clean-build
 clean-build:
@@ -32,7 +182,7 @@ clean-build:
 
 .PHONY: linux-i386
 linux-i386: clean
-	make $(PROGRAM) COMPILER_FLAGS='$(COMPILER_FLAGS_LINUX_X86) $(COMPILER_FLAGS)' EXECUTABLE_NAME='$(PROGRAM).i386'
+	make $(PROGRAM) COMPILER_FLAGS='$(COMPILER_FLAGS_LINUX_I386) $(COMPILER_FLAGS)' COMPILER_FLAGS_LIB='$(COMPILER_FLAGS_LINUX_I386) $(COMPILER_FLAGS_LIB)' EXECUTABLE_NAME='$(PROGRAM).i386'
 
 .PHONY: linux-x86_64
 linux-x86_64: clean
@@ -40,11 +190,11 @@ linux-x86_64: clean
 
 .PHONY: windows-i686
 windows-i686: clean
-	make $(PROGRAM) COMPILER=$(WINDOWS_X86_COMPILER) EXECUTABLE_NAME='$(PROGRAM).i686.exe'
+	make $(PROGRAM) COMPILER=$(WINDOWS_I686_COMPILER) EXECUTABLE_NAME='$(PROGRAM).i686.exe' AR=$(WINDOWS_I686_AR) STRIP=$(WINDOWS_I686_STRIP)
 
 .PHONY: windows-x86_64
 windows-x86_64: clean
-	make $(PROGRAM) COMPILER=$(WINDOWS_X86_64_COMPILER) EXECUTABLE_NAME='$(PROGRAM).x86_64.exe'
+	make $(PROGRAM) COMPILER=$(WINDOWS_X86_64_COMPILER) EXECUTABLE_NAME='$(PROGRAM).x86_64.exe' AR=$(WINDOWS_X86_64_AR) STRIP=$(WINDOWS_X86_64_STRIP)
 
 .PHONY: release
 release:
@@ -99,7 +249,7 @@ linux-i386-deb: linux-i386
 	mkdir -p $(BUILD_DIR)/$(RELEASE_BASE_NAME)-$(VERSION)-$(LINUX_I386_RELEASE_NAME_SUFFIX)/usr/bin
 	mkdir -p $(BUILD_DIR)/$(RELEASE_BASE_NAME)-$(VERSION)-$(LINUX_I386_RELEASE_NAME_SUFFIX)/DEBIAN
 	cp $(BUILD_DIR)/$(EXECUTABLE_NAME) $(BUILD_DIR)/$(PROGRAM)
-	cp -r $(BUILD_DIR)/$(PROGRAM) $(BUILD_DIR)/$(RELEASE_BASE_NAME)-$(VERSION)-$(LINUX_I386_RELEASE_NAME_SUFFIX)/usr/bin
+	cp $(BUILD_DIR)/$(PROGRAM) $(BUILD_DIR)/$(RELEASE_BASE_NAME)-$(VERSION)-$(LINUX_I386_RELEASE_NAME_SUFFIX)/usr/bin
 	cp control-i386 $(BUILD_DIR)/$(RELEASE_BASE_NAME)-$(VERSION)-$(LINUX_I386_RELEASE_NAME_SUFFIX)/DEBIAN/control
 	dpkg-deb --build $(BUILD_DIR)/$(RELEASE_BASE_NAME)-$(VERSION)-$(LINUX_I386_RELEASE_NAME_SUFFIX)
 	rm -rf $(BUILD_DIR)/$(RELEASE_BASE_NAME)-$(VERSION)-$(LINUX_I386_RELEASE_NAME_SUFFIX)
@@ -110,10 +260,32 @@ linux-x86_64-deb: linux-x86_64
 	mkdir -p $(BUILD_DIR)/$(RELEASE_BASE_NAME)-$(VERSION)-$(LINUX_X86_64_RELEASE_NAME_SUFFIX)/usr/bin
 	mkdir -p $(BUILD_DIR)/$(RELEASE_BASE_NAME)-$(VERSION)-$(LINUX_X86_64_RELEASE_NAME_SUFFIX)/DEBIAN
 	cp $(BUILD_DIR)/$(EXECUTABLE_NAME) $(BUILD_DIR)/$(PROGRAM)
-	cp -r $(BUILD_DIR)/$(PROGRAM) $(BUILD_DIR)/$(RELEASE_BASE_NAME)-$(VERSION)-$(LINUX_X86_64_RELEASE_NAME_SUFFIX)/usr/bin
+	cp $(BUILD_DIR)/$(PROGRAM) $(BUILD_DIR)/$(RELEASE_BASE_NAME)-$(VERSION)-$(LINUX_X86_64_RELEASE_NAME_SUFFIX)/usr/bin
 	cp control-x86_64 $(BUILD_DIR)/$(RELEASE_BASE_NAME)-$(VERSION)-$(LINUX_X86_64_RELEASE_NAME_SUFFIX)/DEBIAN/control
 	dpkg-deb --build $(BUILD_DIR)/$(RELEASE_BASE_NAME)-$(VERSION)-$(LINUX_X86_64_RELEASE_NAME_SUFFIX)
 	rm -rf $(BUILD_DIR)/$(RELEASE_BASE_NAME)-$(VERSION)-$(LINUX_X86_64_RELEASE_NAME_SUFFIX)
+
+.PHONY: linux-i386-rpm
+linux-i386-rpm: linux-i386
+	rm -rf rpm-tmp
+	mkdir -p rpm-tmp/RPMS rpm-tmp/SPECS rpm-tmp/SOURCES rpm-tmp/BUILD
+	cp ezre.spec rpm-tmp/SPECS/ezre.spec
+	cp $(BUILD_DIR)/$(EXECUTABLE_NAME) rpm-tmp/SOURCES/$(PROGRAM)
+	ls rpm-tmp/SOURCES/
+	rpmbuild -bb --target i386 rpm-tmp/SPECS/ezre.spec --define "_topdir $(shell pwd)/rpm-tmp"
+	ls rpm-tmp/RPMS
+	mv rpm-tmp/RPMS/i386/*.rpm build/
+	rm -rf rpm-tmp
+
+.PHONY: linux-x86_64-rpm
+linux-x86_64-rpm: linux-x86_64
+	rm -rf rpm-tmp
+	mkdir -p rpm-tmp/RPMS rpm-tmp/SPECS rpm-tmp/SOURCES rpm-tmp/BUILD
+	cp ezre.spec rpm-tmp/SPECS/ezre.spec
+	cp $(BUILD_DIR)/$(EXECUTABLE_NAME) rpm-tmp/SOURCES/$(PROGRAM)
+	rpmbuild -bb --target x86_64 rpm-tmp/SPECS/ezre.spec --define "_topdir $(shell pwd)/rpm-tmp"
+	mv rpm-tmp/RPMS/x86_64/*.rpm build/
+	rm -rf rpm-tmp
 
 .PHONY: all
 all:
@@ -121,10 +293,12 @@ all:
 	
 	make linux-i386-release 
 	make linux-i386-deb EXECUTABLE_NAME='$(PROGRAM).i386'
-	
+	make linux-i386-rpm EXECUTABLE_NAME='$(PROGRAM).i386'
+
 	make linux-x86_64-release 
 	make linux-x86_64-deb EXECUTABLE_NAME='$(PROGRAM).x86_64'
-	
+	make linux-x86_64-rpm EXECUTABLE_NAME='$(PROGRAM).x86_64'
+
 	make windows-i686-release 
 	make windows-x86_64-release
 	

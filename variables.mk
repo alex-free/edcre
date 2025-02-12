@@ -13,8 +13,11 @@ VERSION=1.0.9
 RELEASE_FILES=*.md
 # OPTIONAL: files included only in the Linux portable releases (.zip).
 LINUX_SPECIFIC_RELEASE_FILES=
+# OPTIONAL: files included only in the MacOS portable releases (.zip).
+MACOS_SPECIFIC_RELEASE_FILES=
 # OPTIONAL: files included only in the Windows portable releases (.zip).
 WINDOWS_SPECIFIC_RELEASE_FILES=
+
 
 # All dependencies required to build the software, EzRe style. These deps allow for:
 # C and C++ programs.
@@ -31,17 +34,9 @@ BUILD_DEPENDS_DNF=gcc g++ libstdc++-static.i686 glibc-static.i686 libstdc++-stat
 # REQUIRED: Appended to end of release file name. Release file format is $(RELEASE_BASE_NAME)-$(VERSION)-$(RELEASE_NAME_SUFFIX).
 LINUX_I386_RELEASE_NAME_SUFFIX=linux-i386-static
 LINUX_X86_64_RELEASE_NAME_SUFFIX=linux-x86_64-static
+MACOS_RELEASE_NAME_SUFFIX=macos
 WINDOWS_I686_RELEASE_NAME_SUFFIX=windows-i686-static
 WINDOWS_X86_64_RELEASE_NAME_SUFFIX=windows-x86_64-static
-
-# REQUIRED: Linux Compiler For i386 and x86_64.
-LINUX_COMPILER=g++
-# REQUIRED: Windows Cross Compiler For i686.
-WINDOWS_I686_COMPILER=i686-w64-mingw32-g++
-# REQUIRED: Windows Cross Compiler For x86_64.
-WINDOWS_X86_64_COMPILER=x86_64-w64-mingw32-g++
-# REQUIRED: Host system compiler.
-COMPILER=$(LINUX_COMPILER)
 
 # REQUIRED Linux AR command (for building libraries with EZRE used by the target program).
 LINUX_AR=ar
@@ -62,9 +57,9 @@ WINDOWS_X86_64_STRIP=x86_64-w64-mingw32-strip
 STRIP=$(LINUX_STRIP)
 
 # REQUIRED: compiler flags used to compile $(SOURCE_FILES). To make a C/C++ program portable, you probably at least want `-static` as shown below. I like using `-Wall -Wextra -Werror -pedantic -static` or some variation.
-COMPILER_FLAGS=-Wall -Wextra -Werror -pedantic -static
+COMPILER_FLAGS=-Wall -Wextra -Werror -pedantic
 # REQUIRED: compiler flag appended to $(COMPILER_FLAGS) to compile $(SOURCE_FILES) for Linux x86 builds. This tells GCC to build i386 code on an x86_64 system.
-COMPILER_FLAGS_LINUX_I386=-m32
+COMPILER_FLAGS_LINUX_I386=-static -m32
 # OPTIONAL: You may compile a library with different CFLAGS set here. (i.e. `-Wall -Wextra -Werror -pedantic -Wno-unused-function`)
 COMPILER_FLAGS_LIB=
 # REQUIRED: set to `YES` to build additional libraries (must edit Makefile with relevant info). By default this is set to `NO`.

@@ -65,24 +65,6 @@ ifeq ($(strip $(BUILD_LIB)),)
 	$(error Error: The $$BUILD_LIB variable is not set in variables.mk but is required)
 endif
 
-# Check compiler.
-
-ifeq ($(strip $(COMPILER)),)
-	$(error Error: The $$COMPILER variable is not set in variables.mk but is required)
-endif
-
-ifeq ($(strip $(LINUX_COMPILER)),)
-	$(error Error: The $$LINUX_COMPILER variable is not set in variables.mk but is required)
-endif
-
-ifeq ($(strip $(WINDOWS_I686_COMPILER)),)
-	$(error Error: The $$WINDOWS_I686_COMPILER variable is not set in variables.mk but is required)
-endif
-
-ifeq ($(strip $(WINDOWS_X86_64_COMPILER)),)
-	$(error Error: The $$WINDOWS_X86_64_COMPILER variable is not set in variables.mk but is required)
-endif
-
 # Check compiler flags.
 
 ifeq ($(strip $(COMPILER_FLAGS)),)
@@ -135,24 +117,24 @@ endif
 
 # OPTIONAL, not default: Build C libraries to be used by the target executable. To enable this, you must replace `library-file*` with the actual name of the library, and you must set `BUILD_LIB=YES` in `variables.mk`.
 ifeq ("$(BUILD_LIB)","YES")
-	$(COMPILER) $(COMPILER_FLAGS_LIB) -c library-files-dir/library-file.c -o $(BUILD_DIR)/library-file-object.o
+	$(CXX) $(COMPILER_FLAGS_LIB) -c library-files-dir/library-file.c -o $(BUILD_DIR)/library-file-object.o
 	$(AR) rcs $(BUILD_DIR)/library-file-archive.a $(BUILD_DIR)/library-file-object.o
 
 ifeq ($(strip $(EXECUTABLE_NAME)),)
-	$(COMPILER) $(COMPILER_FLAGS) $(SOURCE_FILES) -L./$(BUILD_DIR) -llibrary-file -o $(BUILD_DIR)/$(PROGRAM)
+	$(CXX) $(COMPILER_FLAGS) $(SOURCE_FILES) -L./$(BUILD_DIR) -llibrary-file -o $(BUILD_DIR)/$(PROGRAM)
 	$(STRIP) $(BUILD_DIR)/$(PROGRAM)
 else
-	$(COMPILER) $(COMPILER_FLAGS) $(SOURCE_FILES) -L./$(BUILD_DIR) -llibrary-file -o $(BUILD_DIR)/$(EXECUTABLE_NAME)
+	$(CXX) $(COMPILER_FLAGS) $(SOURCE_FILES) -L./$(BUILD_DIR) -llibrary-file -o $(BUILD_DIR)/$(EXECUTABLE_NAME)
 	$(STRIP) $(BUILD_DIR)/$(EXECUTABLE_NAME)
 endif
 
 else # Default: Does not build any C libraries. `BUILD_LIB=NO` in `variables.mk`.
 
 ifeq ($(strip $(EXECUTABLE_NAME)),)
-	$(COMPILER) $(COMPILER_FLAGS) $(SOURCE_FILES) -o $(BUILD_DIR)/$(PROGRAM)
+	$(CXX) $(COMPILER_FLAGS) $(SOURCE_FILES) -o $(BUILD_DIR)/$(PROGRAM)
 	$(STRIP) $(BUILD_DIR)/$(PROGRAM)
 else
-	$(COMPILER) $(COMPILER_FLAGS) $(SOURCE_FILES) -o $(BUILD_DIR)/$(EXECUTABLE_NAME)
+	$(CXX) $(COMPILER_FLAGS) $(SOURCE_FILES) -o $(BUILD_DIR)/$(EXECUTABLE_NAME)
 	$(STRIP) $(BUILD_DIR)/$(EXECUTABLE_NAME)
 endif
 
@@ -187,6 +169,10 @@ linux-i386: clean
 .PHONY: linux-x86_64
 linux-x86_64: clean
 	make $(PROGRAM) EXECUTABLE_NAME='$(PROGRAM).x86_64'
+
+.PHONY: macos
+macos: clean
+	make $(PROGRAM) EXECUTABLE_NAME='$(PROGRAM).macos'
 
 .PHONY: windows-i686
 windows-i686: clean
@@ -225,6 +211,14 @@ ifeq ($(strip $(LINUX_SPECIFIC_RELEASE_FILES)),)
 	make release PLATFORM='$(LINUX_X86_64_RELEASE_NAME_SUFFIX)' EXECUTABLE_NAME='$(PROGRAM).x86_64'
 else
 	make release PLATFORM='$(LINUX_X86_64_RELEASE_NAME_SUFFIX)' RELEASE_FILES='$(LINUX_SPECIFIC_RELEASE_FILES) $(RELEASE_FILES)' EXECUTABLE_NAME='$(PROGRAM).x86_64'
+endif
+
+.PHONY: macos-release
+macos-release: macos
+ifeq ($(strip $(MACOS_SPECIFIC_RELEASE_FILES)),)
+	make release PLATFORM='$(MACOS_RELEASE_NAME_SUFFIX)' EXECUTABLE_NAME='$(PROGRAM).macos'
+else
+	make release PLATFORM='$(MACOS_RELEASE_NAME_SUFFIX)' RELEASE_FILES='$(MACOS_SPECIFIC_RELEASE_FILES) $(RELEASE_FILES)' EXECUTABLE_NAME='$(PROGRAM).macos'
 endif
 
 .PHONY: windows-i686-release

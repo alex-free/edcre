@@ -1,0 +1,123 @@
+#!/bin/bash
+
+bsd_md5=false
+
+# BSD MD5 is superior!
+if command -v md5 > /dev/null; then
+    echo "Info: using BSD md5."
+    bsd_md5=true
+elif command -v md5sum > /dev/null; then
+    echo "Info: using GNU Coreutils md5sum."
+else
+    echo "Error: could not find a md5 or md5sum command to verify tests!"
+    exit 1
+fi
+
+if [ $# -ne 2 ]; then
+    echo "Error: You need to provide 2 arguments."
+
+    if [ -z "$1" ]; then
+        echo "Error: The 1st argument must be redump format \"Parasite Eve (USA) (Disc 1).bin\""
+    elif [ -z "$2" ]; then
+        echo "Error: The 2nd argument must be redump format \"Ridge Racer (USA) (Track 01).bin\""
+    fi
+
+    exit 1
+fi
+
+# Put temp directory in /var/tmp to guarantee enough space.
+tmp=$(mktemp -d  /var/tmp/test-edcre.XXX)
+
+# When this script exits, automatically delete the temp directory.
+cleanup() 
+{ 
+    if [[ -e "$tmp" ]]; then
+        echo "Clearing temp files..."  
+        rm -r "$tmp"   
+    fi
+}
+trap cleanup EXIT
+
+# Regenerate executable regardless to apply any possible code changes.
+make -C "$(dirname "$0")"
+
+# Generate checksums for verification compare before possible EDC/ECC changes.
+for arg in "$@"; do
+    echo "Argument: $arg"
+    rm -f $tmp/*.bin
+    cp -v "$arg" $tmp
+
+    if [ "$bsd_md5" == true ]; then
+        md5 -q $tmp/*.bin >> $tmp/before-checksums.txt
+    else
+        md5sum $tmp/*.bin | awk '{ print $1 }' >> $tmp/before-checksums.txt
+    fi
+done
+
+if [ "$1" == "update" ] || [ ! -e "$(dirname "$0")"/"tests/known-good-before-checksums.txt" ]; then
+    cp -v $tmp/before-checksums.txt "$(dirname "$0")"/tests/known-good-before-checksums.txt
+    echo "Known good before checksums updated for test suite."
+fi
+
+test_number=1
+fail_count=0
+
+# Verify before checksums.
+while read -r line1 && read -r line2 <&3; do
+
+    if [ "$line1" != "$line2" ]; then
+        echo "Before test $test_number FAILED to match known good checksum!"
+        ((fail_count++))
+    else
+        echo "Before test $test_number matched known good checksum."
+    fi
+
+    ((test_number++))
+done < "$(dirname "$0")"/tests/known-good-before-checksums.txt 3< $tmp/before-checksums.txt
+
+if [ $fail_count -eq 0 ]; then
+    echo "All before tests PASSED successfully!"
+else
+    echo "$fail_count before test FAILED!"
+fi
+
+# Generate checksums for verification compare after possible EDC/ECC changes.
+for arg in "$@"; do
+    rm -f $tmp/*.bin
+    cp -v "$arg" $tmp
+    build/edcre -v $tmp/*.bin
+
+    if [ "$bsd_md5" == true ]; then
+        md5 -q $tmp/*.bin >> $tmp/after-checksums.txt
+    else
+        md5sum $tmp/*.bin | awk '{ print $1 }' >> $tmp/after-checksums.txt
+    fi
+done
+
+
+if [ "$1" == "update" ] || [ ! -e "$(dirname "$0")"/"tests/known-good-after-checksums.txt" ]; then
+    cp -v $tmp/after-checksums.txt "$(dirname "$0")"/tests/known-good-after-checksums.txt
+    echo "Known good after checksums updated for test suite."
+fi
+
+test_number=1
+fail_count=0
+
+# Verify after checksums.
+while read -r line1 && read -r line2 <&3; do
+
+    if [ "$line1" != "$line2" ]; then
+        echo "After test $test_number FAILED to match known good checksum!"
+        ((fail_count++))
+    else
+        echo "After test $test_number matched known good checksum."
+    fi
+
+    ((test_number++))
+done < "$(dirname "$0")"/tests/known-good-after-checksums.txt 3< $tmp/after-checksums.txt
+
+if [ $fail_count -eq 0 ]; then
+    echo "All after tests PASSED successfully!"
+else
+    echo "$fail_count after test FAILED!"
+fi

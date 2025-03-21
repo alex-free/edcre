@@ -1,6 +1,64 @@
-# Changelog
+# [EDCRE: EDC/ECC Regenerator For BIN+CUE CD Disc Images](readme.md) -> Changelog
 
-## Downloads
+## Version 1.0.9 (2/11/2025)
+
+Changes:
+
+* Fixed Windows builds, closing [issue #3](https://github.com/alex-free/edcre/issues/3).
+
+* For all operating systems, if test only mode is given (`-t`) then the input file is opened as read only, which is more correct. Otherwise it is open as read write so that EDC/ECC can be updated if needed.
+
+* The verbose (`-v`) argument now displays which sectors/lbas are invalid, if any are. Without specifying verbose mode, it is no longer printed by default which exact sectors need updating of EDC/ECC and you just get the scan report at the end saying how many were. This is more consistent with how verbose mode already only displays which sectors/lbas were fixed, rather then just a sum of how many in the scan report.
+
+* Updated EzRe build system to v1.0.3. RPM package files are now generated for i386 and x86_64 Linux.
+
+----------------------------------------------------
+
+*	[edcre-v1.0.9-windows-i686-static.zip](https://github.com/alex-free/edcre/releases/download/v1.0.9/edcre-v1.0.9-windows-i686-static.zip) _Portable Release For Windows 95 OSR 2.5 and above, Pentium CPU minimum (32 bit)_
+
+*	[edcre-v1.0.9-windows-x86\_64-static.zip](https://github.com/alex-free/edcre/releases/download/v1.0.9/edcre-v1.0.9-windows-x86_64-static.zip) _Portable Release For x86_64 Windows (64 bit)_
+
+*	[edcre-v1.0.9-linux-i386-static.zip](https://github.com/alex-free/edcre/releases/download/v1.0.9/edcre-v1.0.9-linux-i386-static.zip) _Portable Release For Linux 3.2.0 and above, 386 CPU minimum (32 bit)_
+
+*	[edcre-v1.0.9-linux-i386-static.deb](https://github.com/alex-free/edcre/releases/download/v1.0.9/edcre-v1.0.9-linux-i386-static.deb) _Deb package file For Linux 3.2.0 and above, 386 CPU minimum (32 bit)_
+
+*	[edcre-1.0.9-1.fc41.i386.rpm](https://github.com/alex-free/edcre/releases/download/v1.0.9/edcre-1.0.9-1.fc41.i386.rpm) _RPM package file For i386 Linux 3.2.0 and above (32 bit)_
+
+*	[edcre-v1.0.9-linux-x86\_64-static.zip](https://github.com/alex-free/edcre/releases/download/v1.0.9/edcre-v1.0.9-linux-x86_64-static.zip) _Portable Release For x86\_64 Linux 3.2.0 and above (64 bit)_
+
+*	[edcre-v1.0.9-linux-x86\_64-static.deb](https://github.com/alex-free/edcre/releases/download/v1.0.9/edcre-v1.0.9-linux-x86_64-static.deb) _Deb package file for x86_64 Linux 3.2.0 and above (64 bit)_
+
+*	[edcre-1.0.9-1.fc41.x86_64.rpm](https://github.com/alex-free/edcre/releases/download/v1.0.9/edcre-1.0.9-1.fc41.x86_64.rpm) _RPM package file For x86_64 Linux 3.2.0 and above (64 bit)_
+
+----------------------------------------------------
+
+## Version 1.0.8 (7/31/2024)
+
+Changes:
+
+*  Improved argument handling (thanks [@jonblau](https://github.com/jonblau) for the [first implementation](https://github.com/alex-free/edcre/pull/2)!).
+
+*  Scan progress is now displayed as a percentage in real time.
+
+*   Optimized and cleaned up code.
+
+*   LBA is provided if not using the `-k` argument in ouput information. Sector number (starting from sector 0 at the begining of the input file) is always provided, even with `-k`.
+
+*   Number of mode 1, mode 2 form 1, and mode 2 form 2 sectors scanned is displayed in the scan report.
+
+----------------------------------------------------
+
+*	[edcre-v1.0.8-windows-i686-static.zip](https://github.com/alex-free/edcre/releases/download/v1.0.8/edcre-v1.0.8-windows-i686-static.zip) _Portable Release For Windows 95 OSR 2.5 and above, Pentium CPU minimum (32 bit)_
+
+*	[edcre-v1.0.8-windows-x86\_64-static.zip](https://github.com/alex-free/edcre/releases/download/v1.0.8/edcre-v1.0.8-windows-x86_64-static.zip) _Portable Release For x86_64 Windows (64 bit)_
+
+*	[edcre-v1.0.8-linux-i386-static.zip](https://github.com/alex-free/edcre/releases/download/v1.0.8/edcre-v1.0.8-linux-i386-static.zip) _Portable Release For Linux 3.2.0 and above, 386 CPU minimum (32 bit)_
+
+*	[edcre-v1.0.8-linux-i386-static.deb](https://github.com/alex-free/edcre/releases/download/v1.0.8/edcre-v1.0.8-linux-i386-static.deb) _Deb package file For Linux 3.2.0 and above, 386 CPU minimum (32 bit)_
+
+*	[edcre-v1.0.8-linux-x86\_64-static.zip](https://github.com/alex-free/edcre/releases/download/v1.0.8/edcre-v1.0.8-linux-x86_64-static.zip) _Portable Release For x86\_64 Linux 3.2.0 and above (64 bit)_
+
+*	[edcre-v1.0.8-linux-x86\_64-static.deb](https://github.com/alex-free/edcre/releases/download/v1.0.8/edcre-v1.0.8-linux-x86_64-static.deb) _Deb package file for x86_64 Linux 3.2.0 and above (64 bit)_
 
 ## Version 1.0.7 (7/4/2024)
 

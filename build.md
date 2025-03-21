@@ -1,38 +1,36 @@
 
 # Building From Source
 
-In the source directory, you may execute any of the following:
+This software is built with the [EZRE](https://github.com/alex-free/ezre) build system. In the source directory, you may execute any of the following:
 
-`make deps-apt` - installs the build dependencies required to compile the program.
+`make deps` - installs the build dependencies required to compile the program on x86_64 Linux or Mac OS. The host Linux distribution must have either the `dnf` or `apt` package manager for this to work. Mac OS hosts must have MacPorts installed.
 
-`make` - creates an executable for x86_64 Linux.
+`make` - creates an executable for the host system.
 
 `make clean` - deletes only the generated executable file created by only executing `make`.
 
-`make clean-build` - deletes the generated build directory in it's entirety.
+`make windows-i686-release` - generate a portable Windows i686 release .zip file for Windows 95 OSR 2.5 and above. Pentium or newer required.
 
-`make all` - **generate all of the following:**
+`make windows-x86_64-release` - generate a portable Windows x86_64 release .zip file for all 64 bit Windows versions.
 
-### For Windows 95 OSR 2.5 and above, Pentium CPU minimum (32 bit)
+`make mac-os-release` - generate a portable Mac OS release .zip file (your current architecture by default). In general any newer Mac OS version that is the same as yours or newer will work with the built executable, with 2 executions. Mac OS 10.15 and newer can't run support x86 32 bit executables. Mac OS X 10.7 and newer can not run PowerPC executables. 
 
-*   Windows i686 static executable file
-*   Portable Windows i386 release .zip file
+`make mac-os-release LEGACY=TRUE` - generate a portable Mac OS release .zip file (same as above can apply alternative values for i.e. PowerPC and or older Mac OS versions).
 
-### For Windows x86_64 (64 bit)
+`make linux-i386-release` - generate a portable Linux i386 release .zip file for kernel version 3.2.0 and newer.
 
-*   Windows x86_64 static executable file
-*   Portable Windows x86_64 release .zip file
+`make linux-i386-deb` - generate a Linux i386 release deb file for kernel version 3.2.0 and newer.
 
-### For Linux 3.2.0 and above, 386 CPU minimum (32 bit)
+`make linux-i386-rpm` - generate a Linux i386 release rpm file for kernel version 3.2.0 and newer.
 
-*   Linux i386 static executable file
-*   Portable Linux i386 release .zip file
-*   Linux i386 release .deb file
+`make linux-x86_64-release` - generate a portable Linux x86_64 release .zip file for kernel version 3.2.0 and newer.
 
-### For Linux 3.2.0 and above, x86_64 (64 bit)
+`make linux-x86_64-deb` - generate a Linux x86_64 release deb file for kernel version 3.2.0 and newer.
 
-*   Linux x86_64 static executable file
-*   Portable Linux x86_64 release .zip file
-*   Linux x86_64 release .deb file
+`make linux-x86_64-rpm` - generate a Linux x86_64 release rpm file for kernel version 3.2.0 and newer.
 
-All output is found in the build directory created in the source directory.
+`make clean-build` - deletes the generated build directory in it's entirety, and therefore, all builds generated.
+
+`make all` - generate all builds/release files. Mac OS hosts don't generate Linux builds and Linux hosts don't generate Mac OS builds.
+
+All output is found in the `build` directory created in the source directory.
